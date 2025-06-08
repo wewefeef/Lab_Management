@@ -155,4 +155,30 @@
       }
     }
   }
+
+  .sidebarMenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    padding: 12px 18px;
+    box-shadow: 0 2px 8px rgba(80, 80, 180, 0.04);
+    transition: box-shadow 0.2s, border 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      border: 1.5px solid #7b3ff2;
+      box-shadow: 0 4px 16px rgba(123, 63, 242, 0.08);
+      background: #f7f3ff;
+    }
+  }
 }

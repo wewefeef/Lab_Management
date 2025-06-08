@@ -48,10 +48,10 @@ const Sidebar = () => {
       </div>
       <hr />
       <div className="center">
-        <ul>
+        <ul className="sidebarMenu">
           <p className="title">MAIN</p>
           <Link to="/home" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <DashboardIcon className="icon" />
               <span>Dashboard</span>
             </li>
@@ -59,19 +59,19 @@ const Sidebar = () => {
 
           <p className="title">LISTS</p>
           <Link to="/users" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <PersonOutlineIcon className="icon" />
               <span>Users</span>
             </li>
           </Link>
           <Link to="/hotels" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <StoreIcon className="icon" />
               <span>Hotels</span>
             </li>
           </Link>
           <Link to="/rooms" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <MeetingRoomIcon className="icon" />
               <span>Rooms</span>
             </li>
@@ -79,25 +79,25 @@ const Sidebar = () => {
 
           <p className="title">USEFUL</p>
           <Link to="/services" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <MiscellaneousServicesIcon className="icon" />
               <span>Service</span>
             </li>
           </Link>
           <Link to="/checkincheckout" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <RoomServiceIcon className="icon" />
               <span>Check-in / Check-out</span>
             </li>
           </Link>
           <Link to="/payment" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <CreditCardIcon className="icon" />
               <span>Payment</span>
             </li>
           </Link>
           <Link to="/invoices" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <ReceiptIcon className="icon" />
               <span>Invoices</span>
             </li>
@@ -105,24 +105,24 @@ const Sidebar = () => {
 
           <p className="title">Thông báo</p>
           <Link to="/notification" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <NotificationsNoneIcon className="icon" />
               <span>Notifications</span>
             </li>
           </Link>
           <Link to="/log" style={{ textDecoration: "none" }}>
-            <li>
+            <li className="menu-item">
               <PsychologyOutlinedIcon className="icon" />
               <span>Logs</span>
             </li>
           </Link>
-          <li>
+          <li className="menu-item">
             <SettingsApplicationsIcon className="icon" />
             <span>Settings</span>
           </li>
 
           <p className="title">USER</p>
-          <li onClick={handleLogout}>
+          <li className="menu-item" onClick={handleLogout}>
             <ExitToAppIcon className="icon" />
             <span>Logout</span>
           </li>

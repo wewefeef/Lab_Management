@@ -2,7 +2,6 @@ import "./single.scss";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
 import Chart from "../../components/chart/chart";
-import List from "../../components/table/table";
 
 const Single = () => {
   return (
@@ -48,8 +47,8 @@ const Single = () => {
           </div>
         </div>
         <div className="bottom">
-        <h1 className="title">Last Transactions</h1>
-          <List/>
+          {/* <h1 className="title">Last Transactions</h1>
+          <List/> */}
         </div>
       </div>
     </div>
