@@ -1,5 +1,102 @@
 .invoices-content {
-  padding: 20px;
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 32px 24px;
+}
+
+.card.invoice-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 32px 24px 24px 24px;
+  margin-bottom: 32px;
+  max-width: 100%;
+  transition: box-shadow 0.2s;
+}
+
+.datatable-wrapper {
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fafb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+// Ẩn tiêu đề nhỏ "invoices" nếu Datatable sinh ra
+.datatable-wrapper > h2,
+.datatable-wrapper > h3,
+.datatable-wrapper > .MuiTypography-root {
+  display: none !important;
+}
+
+.invoice-form {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  margin-bottom: 8px;
+}
+
+.form-group label {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #222;
+  padding-left: 2px;
+}
+
+.form-group-btn {
+  display: flex;
+  align-items: flex-end;
+  min-width: 140px;
+}
+
+.invoice-form input {
+  padding: 10px 14px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 16px;
+  background: #f8fafc;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.invoice-form input:focus {
+  border: 1.5px solid #1976d2;
+  background: #fff;
+}
+
+.btn-primary {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #125ea2;
+}
+
+.card h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
 }
 
 .updateStatusButton {
@@ -13,4 +110,85 @@
 
 .updateStatusButton:hover {
   background-color: #45a049;
+}
+
+/* Nếu dùng MUI DataGrid hoặc bảng custom, thêm style cho header và cell */
+.MuiDataGrid-root,
+.datatable-wrapper .MuiDataGrid-root {
+  border-radius: 12px !important;
+  background: #fff;
+  border: none;
+  font-size: 16px;
+}
+
+.MuiDataGrid-columnHeaders,
+.datatable-wrapper .MuiDataGrid-columnHeaders {
+  background: #f5f7fa;
+  font-weight: 600;
+  font-size: 16px;
+  border-bottom: 1.5px solid #e0e6ed;
+  min-height: 56px !important;
+}
+
+.MuiDataGrid-cell,
+.datatable-wrapper .MuiDataGrid-cell {
+  padding: 12px 8px;
+  font-size: 15px;
+}
+
+.MuiDataGrid-row,
+.datatable-wrapper .MuiDataGrid-row {
+  min-height: 48px !important;
+}
+
+.MuiDataGrid-footerContainer,
+.datatable-wrapper .MuiDataGrid-footerContainer {
+  background: #f5f7fa;
+  border-top: 1px solid #e0e6ed;
+  border-radius: 0 0 12px 12px;
+}
+
+.MuiDataGrid-virtualScroller,
+.datatable-wrapper .MuiDataGrid-virtualScroller {
+  background: #fff;
+}
+
+.custom-table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 16px;
+}
+
+.custom-table thead tr {
+  background: #f6f8fa;
+}
+
+.custom-table th, .custom-table td {
+  padding: 14px 12px;
+  text-align: left;
+}
+
+.custom-table th {
+  font-weight: 600;
+  color: #222;
+  font-size: 17px;
+  border-bottom: 2px solid #f0f1f3;
+}
+
+.custom-table td {
+  color: #444;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.custom-table tr:last-child td {
+  border-bottom: none;
 }

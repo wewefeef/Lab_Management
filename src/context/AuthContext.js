@@ -2,10 +2,20 @@ import { createContext, useEffect, useReducer } from "react";
 
 // Trạng thái ban đầu
 const INITIAL_STATE = {
-  user: JSON.parse(localStorage.getItem("user")) || null,
+  user: null,
   loading: false,
   error: null,
 };
+
+const userStr = localStorage.getItem("user");
+let user = null;
+try {
+  if (userStr && userStr !== "undefined") {
+    user = JSON.parse(userStr);
+  }
+} catch (e) {
+  user = null;
+}
 
 // Tạo context
 export const AuthContext = createContext(INITIAL_STATE);

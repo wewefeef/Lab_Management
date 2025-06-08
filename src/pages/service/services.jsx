@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
 import "./services.scss";
-import { useLog } from "../../logContext"; // Import useLog
+import { useLog } from "../../logContext";
+import instance from "../../API/axios"; // Đảm bảo đã import axios instance
 
 const Service = () => {
-  const { addLog } = useLog(); // Lấy addLog từ context
+  const { addLog } = useLog();
   const [serviceData, setServiceData] = useState({
-    serviceId: "",
     serviceName: "",
     price: "",
     description: "",
@@ -15,22 +15,49 @@ const Service = () => {
 
   const [services, setServices] = useState([]);
 
-  const handleSubmit = () => {
-    if (serviceData.serviceId && serviceData.serviceName && serviceData.price && serviceData.description) {
-      const newService = {
-        id: services.length + 1,
-        serviceId: serviceData.serviceId,
-        serviceName: serviceData.serviceName,
-        price: serviceData.price,
-        status: "Đang chờ xử lý",
-      };
-      setServices([...services, newService]);
+  // Lấy danh sách dịch vụ từ API khi load trang
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await instance.get("/Service", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setServices(res.data); // Giả sử API trả về mảng dịch vụ
+      } catch (err) {
+        alert("Không lấy được danh sách dịch vụ: " + (err.response?.data?.error || err.message));
+      }
+    };
+    fetchServices();
+  }, []);
 
-      // Ghi log
-      addLog("/services", "POST", "Add Service");
-
-      setServiceData({ serviceId: "", serviceName: "", price: "", description: "" });
-      alert(`Đã thêm dịch vụ mới: ${serviceData.serviceName} (ID: ${serviceData.serviceId})`);
+  const handleSubmit = async () => {
+    if (serviceData.serviceName && serviceData.price && serviceData.description) {
+      try {
+        const token = localStorage.getItem("token");
+        const payload = {
+          serviceName: serviceData.serviceName,
+          price: Number(serviceData.price), // Đảm bảo gửi kiểu số
+          description: serviceData.description,
+        };
+        await instance.post(
+          "/Service",
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        addLog("/Service", "POST", "Add Service");
+        setServiceData({ serviceName: "", price: "", description: "" });
+        alert(`Đã thêm dịch vụ mới: ${serviceData.serviceName}`);
+      } catch (err) {
+        alert("Thêm dịch vụ thất bại: " + (err.response?.data?.error || err.message));
+      }
     } else {
       alert("Vui lòng nhập đầy đủ thông tin!");
     }
@@ -70,15 +97,6 @@ const Service = () => {
         <div className="formContainer">
           <div className="formRow">
             <div className="formGroup">
-              <label>Service ID</label>
-              <input
-                type="text"
-                value={serviceData.serviceId}
-                onChange={(e) => setServiceData({ ...serviceData, serviceId: e.target.value })}
-                placeholder="Service ID"
-              />
-            </div>
-            <div className="formGroup">
               <label>Service Name</label>
               <input
                 type="text"
@@ -87,8 +105,6 @@ const Service = () => {
                 placeholder="Service Name"
               />
             </div>
-          </div>
-          <div className="formRow">
             <div className="formGroup">
               <label>Price</label>
               <input
@@ -98,6 +114,8 @@ const Service = () => {
                 placeholder="Price"
               />
             </div>
+          </div>
+          <div className="formRow">
             <div className="formGroup">
               <label>Description</label>
               <textarea
@@ -123,7 +141,6 @@ const Service = () => {
                 <th>Loại dịch vụ</th>
                 <th>Giá dịch vụ</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
@@ -144,24 +161,6 @@ const Service = () => {
                     }
                   >
                     {service.status}
-                  </td>
-                  <td>
-                    {service.status === "Đang chờ xử lý" && (
-                      <>
-                        <button
-                          className="btn btn-confirm"
-                          onClick={() => handleConfirmService(service.id)}
-                        >
-                          Xác nhận
-                        </button>
-                        <button
-                          className="btn btn-cancel"
-                          onClick={() => handleCancelService(service.id)}
-                        >
-                          Hủy
-                        </button>
-                      </>
-                    )}
                   </td>
                 </tr>
               ))}

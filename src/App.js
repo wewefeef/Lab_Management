@@ -50,13 +50,13 @@ function App() {
           <Route path="/newUser" element={<New inputs={userInputs} title="Add New User" />} />
 
           {/* Hotels */}
-          <Route path="/hotels" element={<List columns={hotelColumns} />} />
+          <Route path="/hotels" element={<NewHotel />} />   {/* Sửa dòng này */}
           <Route path="/hotels/new" element={<NewHotel />} />
           <Route path="/hotels/:hotelId" element={<Single />} />
 
           {/* Rooms */}
-          <Route path="/rooms" element={<List columns={roomColumns} />} />
-          <Route path="/rooms/new" element={<Rooms />} />
+          <Route path="/rooms" element={<Rooms />} />
+          {/* <Route path="/rooms/new" element={<Rooms />} /> */} {/* XÓA hoặc COMMENT dòng này */}
           <Route path="/rooms/:roomId" element={<Single />} />
 
           {/* Notification */}

@@ -1,31 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
+import instance from '../API/axios'; // Thêm dòng này
 
 export const Register = () => {
-    const [uname, setuname] = useState('');
-    const [umobile, setumobile] = useState('');
-    const [uemail, setuemail] = useState('');
-    const [upass, setupass] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         console.log('Register component mounted');
-        // Temporarily disabled redirect for testing
-        // const currentPath = window.location.pathname;
-        // if (currentPath === '/register' && localStorage.getItem('uemail') !== null && localStorage.getItem('uemail') !== '') {
-        //     navigate('/login');
-        // }
-    }, [navigate]);
+    }, []);
 
-    const register = (e) => {
+    const register = async (e) => {
         e.preventDefault();
-        localStorage.setItem('uname', uname);
-        localStorage.setItem('umobile', umobile);
-        localStorage.setItem('uemail', uemail);
-        localStorage.setItem('upass', upass);
-        alert(uname + ' : ' + umobile + ' : ' + uemail + ' : ' + upass + ' | Register Successful!');
-        navigate('/login');
+        setError('');
+
+        // Validate all required fields
+        if (!username || !password || !email || !phone || !fullName) {
+            setError('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Email không đúng định dạng (ví dụ: user@example.com).');
+            return;
+        }
+
+        // Validate phone number (10 digits)
+        if (!/^\d{10}$/.test(phone)) {
+            setError('Số điện thoại phải có 10 chữ số.');
+            return;
+        }
+
+        // Validate password length (minimum 6 characters)
+        if (password.length < 6) {
+            setError('Mật khẩu phải có ít nhất 6 ký tự.');
+            return;
+        }
+
+        const payload = {
+            username,
+            password,
+            email,
+            phone: phone.toString(),
+            fullName
+        };
+        console.log('Payload:', payload);
+
+        try {
+            const response = await instance.post('/register', payload);
+            const data = response.data;
+
+            // Lưu thông tin user vào localStorage sau khi đăng ký thành công
+            localStorage.setItem('user', JSON.stringify(data.user));
+            // Tự động chuyển sang trang login với username và password vừa đăng ký
+            navigate('/login', { state: { username, password } });
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.error === 'Email already exists') {
+                setError('Email đã tồn tại, vui lòng chọn email khác.');
+            } else {
+                setError(err.response?.data?.error || err.message || 'Registration failed');
+            }
+            console.error('Registration error:', err);
+        }
     };
 
     return (
@@ -48,26 +92,29 @@ export const Register = () => {
                                     </div>
                                     <form className="row g-3 needs-validation" onSubmit={register}>
                                         <div className="col-12">
-                                            <label htmlFor="yourName" className="form-label">Your Name</label>
-                                            <input type="text" name="name" value={uname} onChange={(e) => setuname(e.target.value)} className="form-control" id="yourName" required />
-                                            <div className="invalid-feedback">Please, enter your name!</div>
+                                            <label htmlFor="username" className="form-label">Username</label>
+                                            <input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" id="username" required />
+                                            <div className="invalid-feedback">Please enter a username!</div>
                                         </div>
                                         <div className="col-12">
-                                            <label htmlFor="yourMobile" className="form-label">Your Mobile</label>
-                                            <input type="number" name="mobile" value={umobile} onChange={(e) => setumobile(e.target.value)} className="form-control" id="yourMobile" required />
-                                            <div className="invalid-feedback">Please enter a valid Mobile address!</div>
+                                            <label htmlFor="fullName" className="form-label">Full Name</label>
+                                            <input type="text" name="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} className="form-control" id="fullName" required />
+                                            <div className="invalid-feedback">Please enter your full name!</div>
                                         </div>
                                         <div className="col-12">
-                                            <label htmlFor="yourEmail" className="form-label">Email</label>
-                                            <div className="input-group has-validation">
-                                                <input type="text" name="email" value={uemail} onChange={(e) => setuemail(e.target.value)} className="form-control" id="yourEmail" required />
-                                                <div className="invalid-feedback">Please choose a Email.</div>
-                                            </div>
+                                            <label htmlFor="email" className="form-label">Email</label>
+                                            <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" id="email" required />
+                                            <div className="invalid-feedback">Please enter a valid email!</div>
                                         </div>
                                         <div className="col-12">
-                                            <label htmlFor="yourPassword" className="form-label">Password</label>
-                                            <input type="password" name="password" value={upass} onChange={(e) => setupass(e.target.value)} className="form-control" id="yourPassword" required />
-                                            <div className="invalid-feedback">Please enter your password!</div>
+                                            <label htmlFor="phone" className="form-label">Phone</label>
+                                            <input type="tel" name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="form-control" id="phone" required />
+                                            <div className="invalid-feedback">Please enter a valid phone number!</div>
+                                        </div>
+                                        <div className="col-12">
+                                            <label htmlFor="password" className="form-label">Password</label>
+                                            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" id="password" required />
+                                            <div className="invalid-feedback">Please enter a password!</div>
                                         </div>
                                         <div className="col-12">
                                             <div className="form-check">
@@ -83,9 +130,9 @@ export const Register = () => {
                                             <p className="small mb-0">Already have an account? <Link to="/login">Login</Link></p>
                                         </div>
                                     </form>
+                                    {error && <p className="text-danger text-center">{error}</p>}
                                 </div>
                             </div>
-                            <div className="credits">Copyright © MohitBhavsar</div>
                         </div>
                     </div>
                 </div>

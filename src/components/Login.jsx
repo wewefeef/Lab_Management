@@ -1,29 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../assets/css/style.css';
 import logo from '../assets/img/logo.png';
+import instance from '../API/axios'; // Thêm dòng này
 
 export const Login = () => {
-    const [uemail, setuemail] = useState('');
-    const [upass, setupass] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    const { state } = location;
 
+    // Nếu có state từ Register, tự động điền username và password
     useEffect(() => {
+        if (state && state.username && state.password) {
+            setUsername(state.username);
+            setPassword(state.password);
+        }
         const currentPath = window.location.pathname;
-        if (currentPath === '/login' && localStorage.getItem('uemail') !== null && localStorage.getItem('uemail') !== '') {
+        if (currentPath === '/login' && localStorage.getItem('token') !== null) {
             navigate('/');
         }
-    }, [navigate]);
+    }, [navigate, state]);
 
-    const login = (e) => {
+    const login = async (e) => {
         e.preventDefault();
-        let email = localStorage.getItem('uemail');
-        let pass = localStorage.getItem('upass');
-        if (uemail === email && upass === pass) {
-            alert(uemail + ' : ' + upass + ' | Login Successful!');
+        setError('');
+
+        // Validate all required fields
+        if (!username || !password) {
+            setError('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        // Validate password length (minimum 6 characters)
+        if (password.length < 6) {
+            setError('Mật khẩu phải có ít nhất 6 ký tự.');
+            return;
+        }
+
+        const payload = {
+            username,
+            password
+        };
+        console.log('Payload:', payload);
+
+        try {
+            const response = await instance.post('/login', payload);
+            const data = response.data;
+
+            // Lưu token và thông tin user vào localStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Điều hướng đến trang home sau khi đăng nhập thành công
             navigate('/home');
-        } else {
-            alert('You do not have an Account, Please Create an Account!');
+        } catch (err) {
+            setError(err.response?.data?.error || err.message || 'Login failed');
+            console.error('Login error:', err);
         }
     };
 
@@ -43,19 +78,19 @@ export const Login = () => {
                                 <div className="card-body">
                                     <div className="pt-4 pb-2">
                                         <h5 className="card-title text-center pb-0 fs-4">Login to Your Account</h5>
-                                        <p className="text-center small">Enter your Email & password to login</p>
+                                        <p className="text-center small">Enter your username & password to login</p>
                                     </div>
                                     <form className="row g-3 needs-validation" onSubmit={login}>
                                         <div className="col-12">
-                                            <label htmlFor="yourEmail" className="form-label">Email</label>
+                                            <label htmlFor="username" className="form-label">Username</label>
                                             <div className="input-group has-validation">
-                                                <input type="text" name="email" value={uemail} onChange={(e) => setuemail(e.target.value)} className="form-control" id="yourEmail" required />
-                                                <div className="invalid-feedback">Please enter your Email.</div>
+                                                <input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" id="username" required />
+                                                <div className="invalid-feedback">Please enter your username.</div>
                                             </div>
                                         </div>
                                         <div className="col-12">
-                                            <label htmlFor="yourPassword" className="form-label">Password</label>
-                                            <input type="password" name="password" value={upass} onChange={(e) => setupass(e.target.value)} className="form-control" id="yourPassword" required />
+                                            <label htmlFor="password" className="form-label">Password</label>
+                                            <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" id="password" required />
                                             <div className="invalid-feedback">Please enter your password!</div>
                                         </div>
                                         <div className="col-12">
@@ -76,6 +111,7 @@ export const Login = () => {
                                             </p>
                                         </div>
                                     </form>
+                                    {error && <p className="text-danger text-center">{error}</p>}
                                 </div>
                             </div>
                         </div>
