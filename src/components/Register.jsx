@@ -78,12 +78,6 @@ export const Register = () => {
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div className="d-flex justify-content-center py-4">
-                                <Link to="/" className="logo d-flex align-items-center w-auto">
-                                    <img src={logo} alt="" />
-                                    <span className="d-none d-lg-block">MohitBhavsar</span>
-                                </Link>
-                            </div>
                             <div className="card mb-3">
                                 <div className="card-body">
                                     <div className="pt-4 pb-2">
@@ -127,7 +121,7 @@ export const Register = () => {
                                             <button className="btn btn-primary w-100" type="submit">Create Account</button>
                                         </div>
                                         <div className="col-12">
-                                            <p className="small mb-0">Already have an account? <Link to="/login">Login</Link></p>
+                                            <p className="small mb-0 text-center">Already have an account? <Link to="/login">Login</Link></p>
                                         </div>
                                     </form>
                                     {error && <p className="text-danger text-center">{error}</p>}

@@ -32,6 +32,7 @@ const Users = () => {
       })
       .replace(/(\d+)\/(\d+)\/(\d+)/, "$2/$1/$3")
   );
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -143,82 +144,110 @@ const Users = () => {
       <div className="usersContainer">
         <Navbar />
         <h1 className="title">Quản lý Khách hàng</h1>
-
         <div className="clock">Thời gian hiện tại: {currentTime}</div>
-
         <div className="stats">Tổng số khách hàng: {users.length}</div>
 
-        <div className="filterSection">
+        {/* Thanh tìm kiếm và nút thêm khách hàng */}
+        <div className="filterSection" style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <input
             type="text"
             placeholder="Tìm kiếm theo tên hoặc email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="searchInput"
+            style={{
+              flex: "none",
+              width: 220,
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              background: "#f8fafc",
+              color: "#555"
+            }}
           />
-        </div>
-
-        <div className="addUserForm">
-          <h2>Thêm khách hàng mới</h2>
-          <div className="formGroup">
-            <label>Username</label>
-            <input
-              type="text"
-              value={newUser.username}
-              onChange={(e) =>
-                setNewUser({ ...newUser, username: e.target.value })
-              }
-              placeholder="Nhập username"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Password</label>
-            <input
-              type="password"
-              value={newUser.password}
-              onChange={(e) =>
-                setNewUser({ ...newUser, password: e.target.value })
-              }
-              placeholder="Nhập password"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Họ và tên</label>
-            <input
-              type="text"
-              value={newUser.fullName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, fullName: e.target.value })
-              }
-              placeholder="Nhập họ và tên"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Email</label>
-            <input
-              type="email"
-              value={newUser.email}
-              onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
-              }
-              placeholder="Nhập email"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Số điện thoại</label>
-            <input
-              type="text"
-              value={newUser.phone}
-              onChange={(e) =>
-                setNewUser({ ...newUser, phone: e.target.value })
-              }
-              placeholder="Nhập số điện thoại"
-            />
-          </div>
-          <button className="btn-submit" onClick={handleAddUser}>
-            Add User
+          <button
+            className="btn btn-add"
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 24px",
+              fontWeight: 500,
+              fontSize: 16,
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+            }}
+            onClick={() => setShowAddForm(!showAddForm)}
+          >
+            {showAddForm ? "Đóng" : "Thêm khách hàng"}
           </button>
         </div>
+
+        {/* Form thêm user chỉ hiện khi showAddForm = true */}
+        {showAddForm && (
+          <div className="addUserForm">
+            <h2>Thêm khách hàng mới</h2>
+            <div className="formGroup">
+              <label>Username</label>
+              <input
+                type="text"
+                value={newUser.username}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, username: e.target.value })
+                }
+                placeholder="Nhập username"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Password</label>
+              <input
+                type="password"
+                value={newUser.password}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, password: e.target.value })
+                }
+                placeholder="Nhập password"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Họ và tên</label>
+              <input
+                type="text"
+                value={newUser.fullName}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, fullName: e.target.value })
+                }
+                placeholder="Nhập họ và tên"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Email</label>
+              <input
+                type="email"
+                value={newUser.email}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, email: e.target.value })
+                }
+                placeholder="Nhập email"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Số điện thoại</label>
+              <input
+                type="text"
+                value={newUser.phone}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, phone: e.target.value })
+                }
+                placeholder="Nhập số điện thoại"
+              />
+            </div>
+            <button className="btn-submit" onClick={handleAddUser}>
+              Add User
+            </button>
+          </div>
+        )}
 
         <div className="usersTable">
           <h2>Danh sách khách hàng</h2>

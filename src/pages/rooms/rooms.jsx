@@ -11,11 +11,13 @@ const Rooms = () => {
     roomNumber: "",
     roomType: "",
     price: 0,
-    status: 0, // số, không phải chuỗi
+    status: 0,
     description: "",
     imageUrl: "",
   });
   const [rooms, setRooms] = useState([]);
+  const [searchRoomNumber, setSearchRoomNumber] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false); // Thêm state này
 
   // Lấy danh sách phòng khi load trang hoặc sau khi thêm phòng mới
   const fetchRooms = async () => {
@@ -79,72 +81,129 @@ const Rooms = () => {
     }
   };
 
+  // Lọc danh sách phòng theo số phòng
+  const filteredRooms = rooms.filter(room =>
+    room.roomNumber.toString().includes(searchRoomNumber)
+  );
+
   return (
     <div className="rooms">
       <Sidebar />
       <div className="roomsContainer">
         <Navbar />
-        <div className="addRoomForm">
-          <h2>Thêm phòng mới</h2>
-          <div className="formGroup">
-            <label>Số phòng</label>
-            <input
-              type="text"
-              value={newRoom.roomNumber}
-              onChange={(e) => setNewRoom({ ...newRoom, roomNumber: e.target.value })}
-              placeholder="Nhập số phòng"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Loại phòng</label>
-            <input
-              type="text"
-              value={newRoom.roomType}
-              onChange={(e) => setNewRoom({ ...newRoom, roomType: e.target.value })}
-              placeholder="Nhập loại phòng (VIP/Thường)"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Giá cả</label>
-            <input
-              type="number"
-              value={newRoom.price}
-              onChange={(e) => setNewRoom({ ...newRoom, price: e.target.value })}
-              placeholder="Nhập giá (USD)"
-              min={0}
-            />
-          </div>
-          <div className="formGroup">
-            <label>Trạng thái</label>
-            <input
-              type="text"
-              value={newRoom.status}
-              onChange={(e) => setNewRoom({ ...newRoom, status: e.target.value })}
-              placeholder="Nhập trạng thái (Còn trống/Đã đặt...)"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Mô tả</label>
-            <input
-              type="text"
-              value={newRoom.description}
-              onChange={(e) => setNewRoom({ ...newRoom, description: e.target.value })}
-              placeholder="Nhập mô tả"
-            />
-          </div>
-          <div className="formGroup">
-            <label>Ảnh phòng (imageUrl)</label>
-            <input
-              type="text"
-              value={newRoom.imageUrl}
-              onChange={(e) => setNewRoom({ ...newRoom, imageUrl: e.target.value })}
-              placeholder="Nhập đường dẫn ảnh"
-            />
-          </div>
-          <button className="btn-submit" onClick={handleAddRoom}>
-            Add Room
+
+        {/* Thanh tìm kiếm và nút thêm phòng */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "20px 0" }}>
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo số phòng..."
+            value={searchRoomNumber}
+            onChange={e => setSearchRoomNumber(e.target.value)}
+            style={{
+              flex: "none",
+              width: 220,
+              padding: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              fontSize: "16px",
+              background: "#f8fafc",
+              color: "#555"
+            }}
+          />
+          <button
+            style={{
+              background: "#2563eb",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 24px",
+              fontWeight: 500,
+              fontSize: 16,
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+            }}
+            onClick={() => setShowAddForm(!showAddForm)}
+          >
+            {showAddForm ? "Đóng" : "Thêm phòng"}
           </button>
         </div>
+
+        {/* Form thêm phòng chỉ hiện khi showAddForm = true */}
+        {showAddForm && (
+          <div
+            className="addRoomForm"
+            style={{
+              background: "#fff",
+              borderRadius: "16px",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
+              padding: "32px 24px",
+              margin: "24px 0",
+              width: "100%",           // Căng rộng ra hết container cha
+              marginLeft: 0,
+              marginRight: 0
+            }}
+          >
+            <h2>Thêm phòng mới</h2>
+            <div className="formGroup">
+              <label>Số phòng</label>
+              <input
+                type="text"
+                value={newRoom.roomNumber}
+                onChange={(e) => setNewRoom({ ...newRoom, roomNumber: e.target.value })}
+                placeholder="Nhập số phòng"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Loại phòng</label>
+              <input
+                type="text"
+                value={newRoom.roomType}
+                onChange={(e) => setNewRoom({ ...newRoom, roomType: e.target.value })}
+                placeholder="Nhập loại phòng (VIP/Thường)"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Giá cả</label>
+              <input
+                type="number"
+                value={newRoom.price}
+                onChange={(e) => setNewRoom({ ...newRoom, price: e.target.value })}
+                placeholder="Nhập giá (USD)"
+                min={0}
+              />
+            </div>
+            <div className="formGroup">
+              <label>Trạng thái</label>
+              <input
+                type="text"
+                value={newRoom.status}
+                onChange={(e) => setNewRoom({ ...newRoom, status: e.target.value })}
+                placeholder="Nhập trạng thái (Còn trống/Đã đặt...)"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Mô tả</label>
+              <input
+                type="text"
+                value={newRoom.description}
+                onChange={(e) => setNewRoom({ ...newRoom, description: e.target.value })}
+                placeholder="Nhập mô tả"
+              />
+            </div>
+            <div className="formGroup">
+              <label>Ảnh phòng (imageUrl)</label>
+              <input
+                type="text"
+                value={newRoom.imageUrl}
+                onChange={(e) => setNewRoom({ ...newRoom, imageUrl: e.target.value })}
+                placeholder="Nhập đường dẫn ảnh"
+              />
+            </div>
+            <button className="btn-submit" onClick={handleAddRoom}>
+              Add Room
+            </button>
+          </div>
+        )}
 
         {/* Bảng danh sách phòng */}
         <div className="roomsTable">
@@ -161,12 +220,12 @@ const Rooms = () => {
               </tr>
             </thead>
             <tbody>
-              {rooms.length === 0 ? (
+              {filteredRooms.length === 0 ? (
                 <tr>
                   <td colSpan="6" style={{ textAlign: "center" }}>Không có phòng nào</td>
                 </tr>
               ) : (
-                rooms.map((room, idx) => (
+                filteredRooms.map((room, idx) => (
                   <tr key={room._id || room.roomNumber}>
                     <td>{idx + 1}</td>
                     <td>{room.roomNumber}</td>

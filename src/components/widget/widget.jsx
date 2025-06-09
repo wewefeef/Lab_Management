@@ -35,9 +35,9 @@ const Widget = ({ type }) => {
       break;
     case "order":
       data = {
-        title: "ORDERS",
+        title: "Rooms",
         isMoney: false,
-        link: "View all orders",
+        link: "View all rooms",
         icon: (
           <ShoppingCartOutlinedIcon
             className="icon"
@@ -51,9 +51,9 @@ const Widget = ({ type }) => {
       break;
     case "earning":
       data = {
-        title: "EARNINGS",
+        title: "Service",
         isMoney: true,
-        link: "View net earnings",
+        link: "View",
         icon: (
           <MonetizationOnOutlinedIcon
             className="icon"
@@ -64,7 +64,7 @@ const Widget = ({ type }) => {
       break;
     case "balance":
       data = {
-        title: "BALANCE",
+        title: "Payment",
         isMoney: true,
         link: "See details",
         icon: (

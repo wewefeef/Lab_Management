@@ -64,12 +64,6 @@ const Sidebar = () => {
               <span>Users</span>
             </li>
           </Link>
-          <Link to="/hotels" style={{ textDecoration: "none" }}>
-            <li className="menu-item">
-              <StoreIcon className="icon" />
-              <span>Hotels</span>
-            </li>
-          </Link>
           <Link to="/rooms" style={{ textDecoration: "none" }}>
             <li className="menu-item">
               <MeetingRoomIcon className="icon" />
@@ -96,10 +90,10 @@ const Sidebar = () => {
               <span>Payment</span>
             </li>
           </Link>
-          <Link to="/invoices" style={{ textDecoration: "none" }}>
+          <Link to="/customer" style={{ textDecoration: "none" }}>
             <li className="menu-item">
-              <ReceiptIcon className="icon" />
-              <span>Invoices</span>
+              <CreditCardIcon className="icon" />
+              <span>Khách hàng</span>
             </li>
           </Link>
 
@@ -146,17 +140,6 @@ const Sidebar = () => {
             </>
           )}
         </ul>
-      </div>
-
-      <div className="bottom">
-        <div
-          className="colorOption"
-          onClick={() => dispatch({ type: "LIGHT" })}
-        ></div>
-        <div
-          className="colorOption"
-          onClick={() => dispatch({ type: "DARK" })}
-        ></div>
       </div>
     </div>
   );
