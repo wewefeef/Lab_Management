@@ -4,6 +4,7 @@ import Navbar from "../../components/navbar/navbar";
 import "./rooms.scss";
 import { useLog } from "../../logContext";
 import instance from "../../API/axios";
+import { FaTrash } from "react-icons/fa"; // Thêm icon thùng rác
 
 const Rooms = () => {
   const { addLog } = useLog();
@@ -18,6 +19,15 @@ const Rooms = () => {
   const [rooms, setRooms] = useState([]);
   const [searchRoomNumber, setSearchRoomNumber] = useState("");
   const [showAddForm, setShowAddForm] = useState(false); // Thêm state này
+  const [editRoomId, setEditRoomId] = useState(null);
+  const [editRoomData, setEditRoomData] = useState({
+    roomNumber: "",
+    roomType: "",
+    price: 0,
+    status: 0,
+    description: "",
+    imageUrl: "",
+  });
 
   // Lấy danh sách phòng khi load trang hoặc sau khi thêm phòng mới
   const fetchRooms = async () => {
@@ -81,6 +91,51 @@ const Rooms = () => {
     }
   };
 
+  // Hàm mở form sửa
+  const handleEditClick = (room) => {
+    setEditRoomId(room._id || room.roomNumber);
+    setEditRoomData({ ...room });
+  };
+
+  // Hàm lưu thông tin đã sửa
+  const handleSaveEdit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await instance.put(
+        `/Room/${editRoomId}`,
+        {
+          ...editRoomData,
+          price: Number(editRoomData.price),
+          status: Number(editRoomData.status),
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      addLog("/Room", "PUT", "Edit Room");
+      setEditRoomId(null);
+      fetchRooms();
+      alert("Cập nhật phòng thành công!");
+    } catch (err) {
+      alert("Cập nhật thất bại: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // Hàm xóa phòng
+  const handleDeleteRoom = async (roomId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa phòng này không?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await instance.delete(`/Room/${roomId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        addLog("/Room", "DELETE", "Delete Room");
+        fetchRooms();
+        alert("Đã xóa phòng thành công!");
+      } catch (err) {
+        alert("Xóa phòng thất bại: " + (err.response?.data?.error || err.message));
+      }
+    }
+  };
+
   // Lọc danh sách phòng theo số phòng
   const filteredRooms = rooms.filter(room =>
     room.roomNumber.toString().includes(searchRoomNumber)
@@ -138,7 +193,7 @@ const Rooms = () => {
               boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
               padding: "32px 24px",
               margin: "24px 0",
-              width: "100%",           // Căng rộng ra hết container cha
+              width: "100%",           
               marginLeft: 0,
               marginRight: 0
             }}
@@ -217,22 +272,158 @@ const Rooms = () => {
                 <th>Mô tả</th>
                 <th>Giá cả (USD)</th>
                 <th>Trạng thái</th>
+                <th style={{ textAlign: "center" }}>PUT</th>
+                <th style={{ textAlign: "center" }}>DELETE</th>
               </tr>
             </thead>
             <tbody>
               {filteredRooms.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>Không có phòng nào</td>
+                  <td colSpan="8" style={{ textAlign: "center" }}>Không có phòng nào</td>
                 </tr>
               ) : (
                 filteredRooms.map((room, idx) => (
                   <tr key={room._id || room.roomNumber}>
                     <td>{idx + 1}</td>
-                    <td>{room.roomNumber}</td>
-                    <td>{room.roomType}</td>
-                    <td>{room.description}</td>
-                    <td>{room.price}</td>
-                    <td>{room.status}</td>
+                    <td>
+                      {editRoomId === (room._id || room.roomNumber) ? (
+                        <input
+                          type="text"
+                          value={editRoomData.roomNumber}
+                          onChange={e => setEditRoomData({ ...editRoomData, roomNumber: e.target.value })}
+                        />
+                      ) : (
+                        room.roomNumber
+                      )}
+                    </td>
+                    <td>
+                      {editRoomId === (room._id || room.roomNumber) ? (
+                        <input
+                          type="text"
+                          value={editRoomData.roomType}
+                          onChange={e => setEditRoomData({ ...editRoomData, roomType: e.target.value })}
+                        />
+                      ) : (
+                        room.roomType
+                      )}
+                    </td>
+                    <td>
+                      {editRoomId === (room._id || room.roomNumber) ? (
+                        <input
+                          type="text"
+                          value={editRoomData.description}
+                          onChange={e => setEditRoomData({ ...editRoomData, description: e.target.value })}
+                        />
+                      ) : (
+                        room.description
+                      )}
+                    </td>
+                    <td>
+                      {editRoomId === (room._id || room.roomNumber) ? (
+                        <input
+                          type="number"
+                          value={editRoomData.price}
+                          onChange={e => setEditRoomData({ ...editRoomData, price: e.target.value })}
+                        />
+                      ) : (
+                        room.price
+                      )}
+                    </td>
+                    <td>
+                      {editRoomId === (room._id || room.roomNumber) ? (
+                        <input
+                          type="number"
+                          value={editRoomData.status}
+                          onChange={e => setEditRoomData({ ...editRoomData, status: e.target.value })}
+                        />
+                      ) : (
+                        room.status
+                      )}
+                    </td>
+                    {/* Cột Sửa */}
+                    <td style={{ textAlign: "center" }}>
+                      <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}>
+                        {editRoomId === (room._id || room.roomNumber) ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: 8,
+                              background: "#eaf6ff", // nền sáng nhẹ
+                              borderRadius: 16,
+                              padding: "6px 10px",
+                              margin: "0 auto",
+                            }}
+                          >
+                            <button
+                              onClick={handleSaveEdit}
+                              style={{
+                                background: "#22c55e", // xanh lá
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "12px",
+                                padding: "8px 22px",
+                                fontWeight: 500,
+                                fontSize: 16,
+                                cursor: "pointer",
+                                minWidth: 60,
+                              }}
+                            >
+                              Lưu
+                            </button>
+                            <button
+                              onClick={() => setEditRoomId(null)}
+                              style={{
+                                background: "#64748b", // xám
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "12px",
+                                padding: "8px 22px",
+                                fontSize: 16,
+                                cursor: "pointer",
+                                minWidth: 60,
+                              }}
+                            >
+                              Hủy
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleEditClick(room)}
+                            style={{
+                              background: "#2563eb",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "20px",
+                              padding: "10px 28px",
+                              fontWeight: 500,
+                              fontSize: 16,
+                              cursor: "pointer",
+                              minWidth: 80
+                            }}
+                          >
+                            Sửa
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    {/* Cột Xóa */}
+                    <td>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <span style={{ height: 18 }}></span>
+                        <FaTrash
+                          style={{ color: "red", cursor: "pointer", fontSize: 22, marginTop: 2 }}
+                          onClick={() => handleDeleteRoom(room._id || room.roomNumber)}
+                          title="Xóa phòng"
+                        />
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}

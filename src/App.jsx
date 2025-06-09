@@ -49,7 +49,6 @@ function App() {
           <Route path="/users/:userId" element={<Single />} />
           <Route path="/newUser" element={<New inputs={userInputs} title="Add New User" />} />
 
-
           {/* Rooms */}
           <Route path="/rooms" element={<Rooms />} />
           {/* <Route path="/rooms/new" element={<Rooms />} /> */} {/* XÓA hoặc COMMENT dòng này */}

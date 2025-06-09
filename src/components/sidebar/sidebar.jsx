@@ -1,7 +1,6 @@
 import "./sidebar.scss";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import StoreIcon from "@mui/icons-material/Store";
 import SettingsApplicationsIcon from "@mui/icons-material/SettingsApplications";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
@@ -10,7 +9,7 @@ import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices
 import RoomServiceIcon from "@mui/icons-material/RoomService";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
-import ReceiptIcon from "@mui/icons-material/Receipt"; 
+import PeopleIcon from "@mui/icons-material/People";
 import { Link, useNavigate } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext, useState } from "react";
@@ -92,7 +91,7 @@ const Sidebar = () => {
           </Link>
           <Link to="/customer" style={{ textDecoration: "none" }}>
             <li className="menu-item">
-              <CreditCardIcon className="icon" />
+              <PeopleIcon className="icon" />
               <span>Khách hàng</span>
             </li>
           </Link>

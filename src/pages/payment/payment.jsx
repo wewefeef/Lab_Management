@@ -1,49 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
 import "./payment.scss";
 import instance from "../../API/axios";
 
 const Payment = () => {
-  const [payments, setPayments] = useState([]);
+  const [records, setRecords] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [form, setForm] = useState({
-    invoiceId: "",
-    serviceId: "",
-    quantity: "",
+    invoiceId: 0,
+    bookingId: "",
+    customerId: "",
+    status: 0,
+    totalAmount: 0,
+    createdAt: new Date().toISOString(),
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Lấy danh sách hóa đơn từ API
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const res = await instance.get("/Invoice");
+        setInvoices(res.data);
+      } catch (err) {
+        setInvoices([]);
+      }
+    };
+    fetchInvoices();
+  }, []);
 
-    // Kiểm tra dữ liệu đầu vào
-    if (
-      !form.invoiceId ||
-      !form.serviceId ||
-      !form.quantity ||
-      Number(form.invoiceId) <= 0 ||
-      Number(form.serviceId) <= 0 ||
-      Number(form.quantity) <= 0
-    ) {
-      alert("Vui lòng nhập đầy đủ và đúng các trường (lớn hơn 0)!");
+
+  // Hàm xuất hóa đơn
+  const handleExportInvoice = async () => {
+    if (!form.customerId || !form.roomId) {
+      alert("Vui lòng nhập Customer ID và Room ID!");
       return;
     }
-
     try {
       const payload = {
-        invoiceId: Number(form.invoiceId),
-        serviceId: Number(form.serviceId),
-        quantity: Number(form.quantity),
+        invoiceId: 0,
+        bookingId: Number(form.roomId), // mapping roomId to bookingId nếu không có bookingId riêng
+        customerId: Number(form.customerId),
+        status: 0,
+        totalAmount: 0,
+        createdAt: new Date().toISOString(),
       };
-      const res = await instance.post("/InvoiceService", payload);
-      setPayments([...payments, res.data]);
-      setForm({ invoiceId: "", serviceId: "", quantity: "" });
-      alert("Gửi thành công!");
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      await instance.post("/Invoice", payload);
+      alert("Xuất hóa đơn thành công!");
+      // Reload danh sách hóa đơn
+      const res = await instance.get("/Invoice");
+      setInvoices(res.data);
     } catch (err) {
       alert(
-        "Có lỗi khi gửi dữ liệu!\n" +
+        "Có lỗi khi xuất hóa đơn!\n" +
           (err?.response?.data?.message || err?.message || "Lỗi không xác định")
       );
       console.error(err);
@@ -55,8 +64,8 @@ const Payment = () => {
       <Sidebar />
       <div className="paymentContainer">
         <Navbar />
-        <h1 className="title">Nhập thông tin thanh toán</h1>
-        <form onSubmit={handleSubmit} className="paymentForm pretty-form">
+        <h1 className="title">Nhập hóa đơn</h1>
+        <form className="paymentForm pretty-form">
           <div className="form-row">
             <div className="form-group">
               <label>Invoice ID</label>
@@ -64,60 +73,101 @@ const Payment = () => {
                 type="number"
                 placeholder="Nhập Invoice ID"
                 value={form.invoiceId}
-                onChange={(e) => setForm({ ...form, invoiceId: e.target.value })}
+                onChange={(e) => setForm({ ...form, invoiceId: Number(e.target.value) })}
                 required
               />
             </div>
             <div className="form-group">
-              <label>Service ID</label>
+              <label>Booking ID</label>
               <input
                 type="number"
-                placeholder="Nhập Service ID"
-                value={form.serviceId}
-                onChange={(e) => setForm({ ...form, serviceId: e.target.value })}
+                placeholder="Nhập Booking ID"
+                value={form.bookingId}
+                onChange={(e) => setForm({ ...form, bookingId: Number(e.target.value) })}
                 required
               />
             </div>
             <div className="form-group">
-              <label>Quantity</label>
+              <label>Customer ID</label>
               <input
                 type="number"
-                placeholder="Nhập Quantity"
-                value={form.quantity}
-                onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+                placeholder="Nhập Customer ID"
+                value={form.customerId}
+                onChange={(e) => setForm({ ...form, customerId: Number(e.target.value) })}
                 required
               />
             </div>
             <div className="form-group">
-              <button type="submit" className="submit-btn">
+              <label>Status</label>
+              <input
+                type="number"
+                placeholder="Nhập Status"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: Number(e.target.value) })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Total Amount</label>
+              <input
+                type="number"
+                placeholder="Nhập Total Amount"
+                value={form.totalAmount}
+                onChange={(e) => setForm({ ...form, totalAmount: Number(e.target.value) })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Created At</label>
+              <input
+                type="datetime-local"
+                value={form.createdAt.slice(0, 16)}
+                onChange={(e) =>
+                  setForm({ ...form, createdAt: new Date(e.target.value).toISOString() })
+                }
+                required
+              />
+            </div>
+            <div className="form-group">
+              <button
+                type="button"
+                className="submit-btn"
+                onClick={handleExportInvoice}
+              >
                 Xuất hóa đơn
               </button>
             </div>
           </div>
         </form>
         <div className="paymentTable pretty-table">
-          <h2>Danh sách thanh toán</h2>
+          <h2>Danh sách hóa đơn</h2>
           <table>
             <thead>
               <tr>
                 <th>Invoice ID</th>
-                <th>Service ID</th>
-                <th>Quantity</th>
+                <th>Booking ID</th>
+                <th>Customer ID</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+                <th>Created At</th>
               </tr>
             </thead>
             <tbody>
-              {payments.length === 0 ? (
+              {invoices.length === 0 ? (
                 <tr>
-                  <td colSpan={3} style={{ textAlign: "center", color: "#aaa" }}>
-                    Chưa có dữ liệu thanh toán
+                  <td colSpan={6} style={{ textAlign: "center", color: "#aaa" }}>
+                    Chưa có hóa đơn
                   </td>
                 </tr>
               ) : (
-                payments.map((p, idx) => (
+                invoices.map((inv, idx) => (
                   <tr key={idx}>
-                    <td>{p.invoiceId}</td>
-                    <td>{p.serviceId}</td>
-                    <td>{p.quantity}</td>
+                    <td>{inv.invoiceId}</td>
+                    <td>{inv.bookingId}</td>
+                    <td>{inv.customerId}</td>
+                    <td>{inv.status}</td>
+                    <td>{inv.totalAmount}</td>
+                    <td>{inv.createdAt}</td>
                   </tr>
                 ))
               )}

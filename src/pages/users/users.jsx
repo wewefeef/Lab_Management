@@ -4,6 +4,7 @@ import Navbar from "../../components/navbar/navbar";
 import "./users.scss";
 import { useLog } from "../../logContext"; // Import useLog
 import instance from "../../API/axios";
+import { FaTrash } from "react-icons/fa"; // nhớ cài react-icons nếu chưa có
 
 const Users = () => {
   const { addLog } = useLog();
@@ -33,6 +34,13 @@ const Users = () => {
       .replace(/(\d+)\/(\d+)\/(\d+)/, "$2/$1/$3")
   );
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+  const [editUserData, setEditUserData] = useState({
+    username: "",
+    fullName: "",
+    email: "",
+    phone: "",
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -121,6 +129,55 @@ const Users = () => {
     }
   };
 
+  // Hàm bắt đầu sửa
+  const handleEditClick = (user) => {
+    setEditUserId(user.id);
+    setEditUserData({
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone,
+    });
+  };
+
+  // Hàm lưu sửa
+  const handleSaveEdit = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await instance.put(
+        `/User/${id}`,
+        editUserData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setUsers(users.map(u => u.id === id ? { ...u, ...editUserData } : u));
+      setEditUserId(null);
+      alert("Cập nhật thành công!");
+    } catch (err) {
+      alert("Lỗi cập nhật: " + (err.response?.data?.error || err.message));
+    }
+  };
+
+  // Hàm xóa user
+  const handleDeleteUser = async (id) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng này không?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await instance.delete(`/User/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUsers(users.filter(u => u.id !== id));
+        alert("Đã xóa thành công!");
+      } catch (err) {
+        alert("Lỗi xóa: " + (err.response?.data?.error || err.message));
+      }
+    }
+  };
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -143,8 +200,8 @@ const Users = () => {
       <Sidebar />
       <div className="usersContainer">
         <Navbar />
-        <h1 className="title">Quản lý Khách hàng</h1>
-        <div className="clock">Thời gian hiện tại: {currentTime}</div>
+        <h1 className="title">Quản lý User</h1>
+        {/* <div className="clock">Thời gian hiện tại: {currentTime}</div> */}
         <div className="stats">Tổng số khách hàng: {users.length}</div>
 
         {/* Thanh tìm kiếm và nút thêm khách hàng */}
@@ -259,19 +316,128 @@ const Users = () => {
                 <th>Họ và tên</th>
                 <th>Email</th>
                 <th>Số điện thoại</th>
-                <th>Hành động</th>
+                <th>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    Xóa
+                  </div>
+                </th>
+                <th>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <span>Sửa</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((user, index) => (
-                <tr key={user.username + index}>
+                <tr key={user.id || user.username + index}>
                   <td>{index + 1}</td>
-                  <td>{user.username}</td>
-                  <td>{user.fullName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
                   <td>
-                    <button className="btn btn-view">Đã cập nhật</button>
+                    {editUserId === user.id ? (
+                      <input
+                        value={editUserData.username}
+                        onChange={e => setEditUserData({ ...editUserData, username: e.target.value })}
+                      />
+                    ) : user.username}
+                  </td>
+                  <td>
+                    {editUserId === user.id ? (
+                      <input
+                        value={editUserData.fullName}
+                        onChange={e => setEditUserData({ ...editUserData, fullName: e.target.value })}
+                      />
+                    ) : user.fullName}
+                  </td>
+                  <td>
+                    {editUserId === user.id ? (
+                      <input
+                        value={editUserData.email}
+                        onChange={e => setEditUserData({ ...editUserData, email: e.target.value })}
+                      />
+                    ) : user.email}
+                  </td>
+                  <td>
+                    {editUserId === user.id ? (
+                      <input
+                        value={editUserData.phone}
+                        onChange={e => setEditUserData({ ...editUserData, phone: e.target.value })}
+                      />
+                    ) : user.phone}
+                  </td>
+                  <td style={{ textAlign: "center" }}>
+                    <button
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        color: "#e11d48",
+                        fontSize: 18,
+                      }}
+                      onClick={() => handleDeleteUser(user.id)}
+                      title="Xóa"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                  <td>
+                    {editUserId === user.id ? (
+                      <div style={{
+                        display: "flex",
+                        gap: 8,
+                        background: "#e0f2fe",
+                        borderRadius: 8,
+                        padding: "4px 8px",
+                        justifyContent: "center"
+                      }}>
+                        <button
+                          style={{
+                            background: "#22c55e",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 6,
+                            padding: "4px 12px",
+                            cursor: "pointer"
+                          }}
+                          onClick={() => handleSaveEdit(user.id)}
+                        >
+                          Lưu
+                        </button>
+                        <button
+                          style={{
+                            background: "#64748b",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 6,
+                            padding: "4px 12px",
+                            cursor: "pointer"
+                          }}
+                          onClick={() => setEditUserId(null)}
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        background: "#2563eb",
+                        borderRadius: 8,
+                        padding: "4px 8px"
+                      }}>
+                        <button
+                          style={{
+                            background: "none",
+                            color: "#fff",
+                            border: "none",
+                            fontWeight: 500,
+                            cursor: "pointer"
+                          }}
+                          onClick={() => handleEditClick(user)}
+                        >
+                          Sửa
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
