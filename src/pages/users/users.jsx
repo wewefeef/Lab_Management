@@ -1,16 +1,36 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
-import "./users.scss";
-import { useLog } from "../../logContext"; // Import useLog
-import instance from "../../API/axios";
-import { FaTrash } from "react-icons/fa"; // nhớ cài react-icons nếu chưa có
+import DeleteUserModal from "../../components/users/DeleteUserModal";
+import UserFormModal from "../../components/users/UserFormModal";
+import {
+  fetchUsers,
+  fetchRoles,
+  addUser,
+  updateUser,
+} from "../../services/userService";
+import { toast, ToastContainer } from "react-toastify";
+import { useLog } from "../../logContext";
+import { FaTrash } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+
+const getRoleNameVN = (roleName) =>
+  ({
+    Admin: "Quản trị viên",
+    Receptionist: "Nhân viên lễ tân",
+    Accountant: "Kế toán",
+    Customer: "Khách hàng",
+  }[roleName] || roleName);
 
 const Users = () => {
   const { addLog } = useLog();
-
-  // Xóa dữ liệu mẫu, khởi tạo rỗng
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
   const [newUser, setNewUser] = useState({
     username: "",
@@ -18,432 +38,219 @@ const Users = () => {
     fullName: "",
     email: "",
     phone: "",
+    roleId: "",
   });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentTime, setCurrentTime] = useState(
-    new Date()
-      .toLocaleString("en-US", {
-        timeZone: "Asia/Ho_Chi_Minh",
-        hour12: true,
-        hour: "2-digit",
-        minute: "2-digit",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-      .replace(/(\d+)\/(\d+)\/(\d+)/, "$2/$1/$3")
-  );
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editUserId, setEditUserId] = useState(null);
   const [editUserData, setEditUserData] = useState({
     username: "",
     fullName: "",
     email: "",
     phone: "",
+    roleId: "",
+    role: null,
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date()
-        .toLocaleString("en-US", {
-          timeZone: "Asia/Ho_Chi_Minh",
-          hour12: true,
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })
-        .replace(/(\d+)\/(\d+)\/(\d+)/, "$2/$1/$3");
-      setCurrentTime(now);
-    }, 60000);
-    return () => clearInterval(interval);
+    const token = localStorage.getItem("token");
+    fetchUsers(token)
+      .then((res) => setUsers(res.data))
+      .catch(() => toast.error("Lỗi lấy danh sách user"));
+    fetchRoles(token)
+      .then((res) => setRoles(res.data))
+      .catch(() => toast.error("Lỗi lấy danh sách vai trò"));
   }, []);
 
-  // Lấy danh sách user từ API khi load trang
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await instance.get("/User", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUsers(res.data); // Giả sử API trả về mảng user
-      } catch (err) {
-        console.error("Lỗi lấy danh sách user:", err.response?.data || err.message);
-      }
-    };
-    fetchUsers();
-  }, []);
+  const filteredUsers = users.filter(
+    (u) =>
+      u.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleAddUser = async () => {
-    if (
-      newUser.username &&
-      newUser.password &&
-      newUser.fullName &&
-      newUser.email &&
-      newUser.phone
-    ) {
-      try {
-        const token = localStorage.getItem("token"); // Lấy token đã lưu sau khi đăng nhập
-        if (!token) {
-          alert("Bạn chưa đăng nhập hoặc token đã hết hạn!");
-          return;
-        }
-        const payload = {
-          roleId: "4", // hoặc "1" nếu muốn tạo admin, tuỳ backend yêu cầu
-          username: newUser.username,
-          password: newUser.password,
-          fullName: newUser.fullName,
-          email: newUser.email,
-          phone: newUser.phone,
-        };
-        await instance.post(
-          "/User",
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json", // Đảm bảo giống Swagger
-            },
-          }
-        );
-        setUsers([...users, newUser]);
-        addLog("/User", "POST", "Add User");
-        setNewUser({
-          username: "",
-          password: "",
-          fullName: "",
-          email: "",
-          phone: "",
-        });
-        alert(`Đã thêm khách hàng ${newUser.fullName} thành công!`);
-      } catch (err) {
-        console.error("API error:", err.response?.data || err.message);
-        alert("Thêm user thất bại: " + (err.response?.data?.error || err.message));
-      }
-    } else {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (Object.values(newUser).some((v) => !v))
+      return toast.warning("Vui lòng nhập đầy đủ thông tin!");
+    try {
+      const token = localStorage.getItem("token");
+      await addUser(token, newUser);
+      setUsers([...users, newUser]);
+      addLog("/User", "POST", "Add User");
+      setNewUser({
+        username: "",
+        password: "",
+        fullName: "",
+        email: "",
+        phone: "",
+        roleId: "",
+      });
+      setShowAddForm(false);
+      toast.success(`Đã thêm khách hàng ${newUser.fullName} thành công!`);
+    } catch (err) {
+      toast.error(
+        "Thêm user thất bại: " + (err.response?.data?.error || err.message)
+      );
     }
   };
 
-  // Hàm bắt đầu sửa
   const handleEditClick = (user) => {
-    setEditUserId(user.id);
+    setEditUserId(user.userId);
     setEditUserData({
       username: user.username,
       fullName: user.fullName,
       email: user.email,
       phone: user.phone,
+      roleId: user.role?.roleId || "",
+      role: user.role || null,
     });
   };
 
-  // Hàm lưu sửa
-  const handleSaveEdit = async (id) => {
+  const handleSaveEdit = async (userId) => {
     try {
       const token = localStorage.getItem("token");
-      await instance.put(
-        `/User/${id}`,
-        editUserData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      await updateUser(token, userId, editUserData);
+      setUsers(
+        users.map((u) => (u.userId === userId ? { ...u, ...editUserData } : u))
       );
-      setUsers(users.map(u => u.id === id ? { ...u, ...editUserData } : u));
       setEditUserId(null);
-      alert("Cập nhật thành công!");
+      toast.success("Cập nhật thành công!");
     } catch (err) {
-      alert("Lỗi cập nhật: " + (err.response?.data?.error || err.message));
+      toast.error(
+        "Lỗi cập nhật: " + (err.response?.data?.error || err.message)
+      );
     }
   };
-
-  // Hàm xóa user
-  const handleDeleteUser = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa khách hàng này không?")) {
-      try {
-        const token = localStorage.getItem("token");
-        await instance.delete(`/User/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(users.filter(u => u.id !== id));
-        alert("Đã xóa thành công!");
-      } catch (err) {
-        alert("Lỗi xóa: " + (err.response?.data?.error || err.message));
-      }
-    }
-  };
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
-  });
-
-  const userStr = localStorage.getItem("user");
-  let user = null;
-  try {
-    if (userStr && userStr !== "undefined") {
-      user = JSON.parse(userStr);
-    }
-  } catch (e) {
-    user = null;
-  }
 
   return (
-    <div className="users">
-      <Sidebar />
-      <div className="usersContainer">
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar className="w-16 flex-shrink-0" />
+      <div className="flex-1 flex flex-col">
         <Navbar />
-        <h1 className="title">Quản lý User</h1>
-        {/* <div className="clock">Thời gian hiện tại: {currentTime}</div> */}
-        <div className="stats">Tổng số khách hàng: {users.length}</div>
-
-        {/* Thanh tìm kiếm và nút thêm khách hàng */}
-        <div className="filterSection" style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên hoặc email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="searchInput"
-            style={{
-              flex: "none",
-              width: 220,
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              background: "#f8fafc",
-              color: "#555"
-            }}
-          />
-          <button
-            className="btn btn-add"
-            style={{
-              background: "#2563eb",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "10px 24px",
-              fontWeight: 500,
-              fontSize: 16,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
-            }}
-            onClick={() => setShowAddForm(!showAddForm)}
-          >
-            {showAddForm ? "Đóng" : "Thêm khách hàng"}
-          </button>
-        </div>
-
-        {/* Form thêm user chỉ hiện khi showAddForm = true */}
-        {showAddForm && (
-          <div className="addUserForm">
-            <h2>Thêm khách hàng mới</h2>
-            <div className="formGroup">
-              <label>Username</label>
-              <input
-                type="text"
-                value={newUser.username}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, username: e.target.value })
-                }
-                placeholder="Nhập username"
-              />
-            </div>
-            <div className="formGroup">
-              <label>Password</label>
-              <input
-                type="password"
-                value={newUser.password}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, password: e.target.value })
-                }
-                placeholder="Nhập password"
-              />
-            </div>
-            <div className="formGroup">
-              <label>Họ và tên</label>
-              <input
-                type="text"
-                value={newUser.fullName}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, fullName: e.target.value })
-                }
-                placeholder="Nhập họ và tên"
-              />
-            </div>
-            <div className="formGroup">
-              <label>Email</label>
-              <input
-                type="email"
-                value={newUser.email}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, email: e.target.value })
-                }
-                placeholder="Nhập email"
-              />
-            </div>
-            <div className="formGroup">
-              <label>Số điện thoại</label>
-              <input
-                type="text"
-                value={newUser.phone}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phone: e.target.value })
-                }
-                placeholder="Nhập số điện thoại"
-              />
-            </div>
-            <button className="btn-submit" onClick={handleAddUser}>
-              Add User
+        <main className="flex-1 p-6">
+          <h1 className="text-2xl font-bold mb-2">Quản lý User</h1>
+          <div className="mb-4 text-gray-600">
+            Tổng số khách hàng:{" "}
+            <span className="font-semibold">{users.length}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên hoặc email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-56 px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <button
+              className={`px-6 py-2 rounded-lg font-medium text-base shadow transition ${
+                showAddForm
+                  ? "bg-gray-500 hover:bg-gray-600"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } text-white`}
+              onClick={() => setShowAddForm(!showAddForm)}
+            >
+              {showAddForm ? "Đóng" : "Thêm khách hàng"}
             </button>
           </div>
-        )}
-
-        <div className="usersTable">
-          <h2>Danh sách khách hàng</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Username</th>
-                <th>Họ và tên</th>
-                <th>Email</th>
-                <th>Số điện thoại</th>
-                <th>
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    Xóa
-                  </div>
-                </th>
-                <th>
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    <span>Sửa</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user, index) => (
-                <tr key={user.id || user.username + index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    {editUserId === user.id ? (
-                      <input
-                        value={editUserData.username}
-                        onChange={e => setEditUserData({ ...editUserData, username: e.target.value })}
-                      />
-                    ) : user.username}
-                  </td>
-                  <td>
-                    {editUserId === user.id ? (
-                      <input
-                        value={editUserData.fullName}
-                        onChange={e => setEditUserData({ ...editUserData, fullName: e.target.value })}
-                      />
-                    ) : user.fullName}
-                  </td>
-                  <td>
-                    {editUserId === user.id ? (
-                      <input
-                        value={editUserData.email}
-                        onChange={e => setEditUserData({ ...editUserData, email: e.target.value })}
-                      />
-                    ) : user.email}
-                  </td>
-                  <td>
-                    {editUserId === user.id ? (
-                      <input
-                        value={editUserData.phone}
-                        onChange={e => setEditUserData({ ...editUserData, phone: e.target.value })}
-                      />
-                    ) : user.phone}
-                  </td>
-                  <td style={{ textAlign: "center" }}>
-                    <button
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "#e11d48",
-                        fontSize: 18,
-                      }}
-                      onClick={() => handleDeleteUser(user.id)}
-                      title="Xóa"
+          {/* Bảng danh sách khách hàng */}
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-4">Danh sách khách hàng</h2>
+            <div className="overflow-x-auto rounded-lg shadow bg-white">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      STT
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Username
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Họ và tên
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Email
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Số điện thoại
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Vai trò
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Xóa
+                    </th>
+                    <th className="px-4 py-2 text-center font-medium text-gray-700">
+                      Sửa
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {filteredUsers.map((user, idx) => (
+                    <tr
+                      key={user.userId || user.username + idx}
+                      className="hover:bg-gray-50"
                     >
-                      <FaTrash />
-                    </button>
-                  </td>
-                  <td>
-                    {editUserId === user.id ? (
-                      <div style={{
-                        display: "flex",
-                        gap: 8,
-                        background: "#e0f2fe",
-                        borderRadius: 8,
-                        padding: "4px 8px",
-                        justifyContent: "center"
-                      }}>
+                      <td className="px-4 py-2 text-center">{idx + 1}</td>
+                      <td className="px-4 py-2">{user.username}</td>
+                      <td className="px-4 py-2">{user.fullName}</td>
+                      <td className="px-4 py-2">{user.email}</td>
+                      <td className="px-4 py-2">{user.phone}</td>
+                      <td className="px-4 py-2">
+                        {getRoleNameVN(user.role?.roleName) || ""}
+                      </td>
+                      <td className="px-4 py-2 text-center">
                         <button
-                          style={{
-                            background: "#22c55e",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: 6,
-                            padding: "4px 12px",
-                            cursor: "pointer"
+                          className="text-red-600 hover:text-red-800 text-lg"
+                          onClick={() => {
+                            setUserIdToDelete(user.userId);
+                            setShowDeleteModal(true);
                           }}
-                          onClick={() => handleSaveEdit(user.id)}
+                          title="Xóa"
                         >
-                          Lưu
+                          <FaTrash />
                         </button>
+                      </td>
+                      <td className="px-4 py-2 text-center">
                         <button
-                          style={{
-                            background: "#64748b",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: 6,
-                            padding: "4px 12px",
-                            cursor: "pointer"
-                          }}
-                          onClick={() => setEditUserId(null)}
-                        >
-                          Hủy
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        background: "#2563eb",
-                        borderRadius: 8,
-                        padding: "4px 8px"
-                      }}>
-                        <button
-                          style={{
-                            background: "none",
-                            color: "#fff",
-                            border: "none",
-                            fontWeight: 500,
-                            cursor: "pointer"
-                          }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded px-4 py-1 transition"
                           onClick={() => handleEditClick(user)}
                         >
                           Sửa
                         </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {/* Các modal */}
+          <UserFormModal
+            show={showAddForm}
+            onClose={() => setShowAddForm(false)}
+            onSubmit={handleAddUser}
+            userData={newUser}
+            setUserData={setNewUser}
+            roles={roles}
+            isEdit={false}
+            getRoleNameVN={getRoleNameVN}
+          />
+          <UserFormModal
+            show={!!editUserId}
+            onClose={() => setEditUserId(null)}
+            onSubmit={() => handleSaveEdit(editUserId)}
+            userData={editUserData}
+            setUserData={setEditUserData}
+            roles={roles}
+            isEdit={true}
+            getRoleNameVN={getRoleNameVN}
+          />
+          <DeleteUserModal
+            show={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            userId={userIdToDelete}
+            setUsers={setUsers}
+            users={users}
+          />
+          <ToastContainer position="top-right" autoClose={2000} />
+        </main>
       </div>
     </div>
   );

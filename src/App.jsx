@@ -6,6 +6,7 @@ import { Register } from './components/Register.jsx';
 import Home from "./pages/home/home.jsx";
 import DashboardAdmin from "./pages/dashboard-admin/dashboard-admin.jsx";
 import Single from "./pages/single/single.jsx";
+import Customer from './pages/customer/Customer.jsx';
 import New from "./pages/new/new.jsx";
 import { NotificationInputs, productInputs, userInputs } from "./formSource.js";
 import Payment from "./pages/payment/payment.jsx";
@@ -27,7 +28,7 @@ function App() {
         <Routes>
 
           {/* Trang chính */}
-          <Route path="/dashboard" element={<DashboardAdmin />} />
+          <Route path="/admin" element={<DashboardAdmin />} />
           {/* Trang đăng nhập, đăng ký */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -67,6 +68,7 @@ function App() {
           {/* Payment */}
           <Route path="/payment" element={<Payment />} />
           <Route path="/newPayment" element={<New inputs={productInputs} title="Add New Payment" />} />
+          <Route path="/customer" element={<Customer />} />
 
           {/* Wildcard route */}
           <Route path="*" element={<Login />} />
