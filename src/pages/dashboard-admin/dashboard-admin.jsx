@@ -14,6 +14,14 @@ const DashboardAdmin = () => {
     if (!token) {
       navigate("/login");
     }
+
+    // Fix ResizeObserver loop error
+    const handleResizeObserverErr = () => {};
+    window.addEventListener('error', handleResizeObserverErr);
+
+    return () => {
+      window.removeEventListener('error', handleResizeObserverErr);
+    };
   }, [navigate]);
 
   return (

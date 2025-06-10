@@ -5,22 +5,20 @@ import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalance
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { useState, useEffect } from "react";
 
 const Widget = ({ type }) => {
-  let data;
+  const [amount, setAmount] = useState(0);
+  const [diff, setDiff] = useState(0);
 
-  //temporary
-  const amount = 100;
-  const diff = 20;
+  let data = {};
 
   switch (type) {
     case "user":
       data = {
         title: "USERS",
         isMoney: false,
-        linkto: "/users",
+        linkto: "/user",
         link: "See all users",
         icon: (
           <PersonOutlinedIcon
@@ -31,12 +29,15 @@ const Widget = ({ type }) => {
             }}
           />
         ),
+        api: "/user",
+        getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "order":
       data = {
         title: "Rooms",
         isMoney: false,
+        linkto: "/room",
         link: "View all rooms",
         icon: (
           <ShoppingCartOutlinedIcon
@@ -47,12 +48,15 @@ const Widget = ({ type }) => {
             }}
           />
         ),
+        api: "/room",
+        getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "earning":
       data = {
         title: "Service",
-        isMoney: true,
+        isMoney: false,
+        linkto: "/service",
         link: "View",
         icon: (
           <MonetizationOnOutlinedIcon
@@ -60,12 +64,15 @@ const Widget = ({ type }) => {
             style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
           />
         ),
+        api: "/service",
+        getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "balance":
       data = {
         title: "Payment",
         isMoney: true,
+        linkto: "/payment",
         link: "See details",
         icon: (
           <AccountBalanceWalletOutlinedIcon
@@ -76,11 +83,34 @@ const Widget = ({ type }) => {
             }}
           />
         ),
+        api: "/invoice",
+        getValue: (res) =>
+          Array.isArray(res)
+            ? res.reduce((sum, item) => sum + (item.amount || 0), 0)
+            : 0,
       };
       break;
     default:
       break;
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(data.api, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await res.json();
+        setAmount(data.getValue(result));
+        setDiff(20); // Tạm thời giữ 20% như mẫu, có thể sửa sau
+      } catch (e) {
+        setAmount(0);
+        setDiff(0);
+      }
+    };
+    if (data.api) fetchData();
+  }, [data.api]);
 
   return (
     <div className="widget">
@@ -89,7 +119,7 @@ const Widget = ({ type }) => {
         <span className="counter">
           {data.isMoney && "$"} {amount}
         </span>
-        <Link to={data.linkto} className="link-to">
+        <Link to={data.linkto || "#"} className="link-to">
           <span className="link">{data.link}</span>
         </Link>
       </div>

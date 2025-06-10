@@ -4,6 +4,12 @@ import App from "./App";
 import { AuthContextProvider } from "./context/AuthContext";
 import { DarkModeContextProvider } from "./context/darkModeContext";
 
+window.addEventListener('error', (e) => {
+  if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+    e.stopImmediatePropagation();
+  }
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <AuthContextProvider>

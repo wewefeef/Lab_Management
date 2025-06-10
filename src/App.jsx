@@ -27,8 +27,6 @@ import HotelList from "./pages/home/hotellist.jsx";
 import TestimonialSection from "./pages/home/TestimonialSection.jsx";
 import Footer from "./pages/home/Footer.jsx";
 
-
-
 function App() {
   return (
     <LogProvider>

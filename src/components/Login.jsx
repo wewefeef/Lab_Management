@@ -11,14 +11,14 @@ export const Login = () => {
     const location = useLocation();
     const { state } = location;
 
-    // Nếu có state từ Register, tự động điền username và password
     useEffect(() => {
+        // Nếu có state từ Register, tự động điền username và password
         if (state && state.username && state.password) {
             setUsername(state.username);
             setPassword(state.password);
         }
-        const currentPath = window.location.pathname;
-        if (currentPath === '/login' && localStorage.getItem('token') !== null) {
+        // Nếu đã có token thì chuyển hướng về trang chủ
+        if (localStorage.getItem('token')) {
             navigate('/');
         }
     }, [navigate, state]);
@@ -45,13 +45,6 @@ export const Login = () => {
             const data = response.data;
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-
-            // Điều hướng theo vai trò
-            if (data.user.role?.roleName === "Admin") {
-                navigate('/admin');
-            } else {
-                navigate('/home');
-            }
         } catch (err) {
             setError(err.response?.data?.error || err.message || 'Login failed');
             console.error('Login error:', err);
