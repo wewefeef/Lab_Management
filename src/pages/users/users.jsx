@@ -124,7 +124,7 @@ const Users = () => {
       <div className="flex-1 flex flex-col">
         <Navbar />
         <main className="flex-1 p-6">
-          <h1 className="text-2xl font-bold mb-2">Quản lý User</h1>
+          <h1 className="text-2xl font-bold mb-2 text-blue-700">Quản lý User</h1>
           <div className="mb-4 text-gray-600">
             Tổng số khách hàng:{" "}
             <span className="font-semibold">{users.length}</span>
@@ -150,7 +150,7 @@ const Users = () => {
           </div>
           {/* Bảng danh sách khách hàng */}
           <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-4">Danh sách khách hàng</h2>
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Danh sách khách hàng</h2>
             <div className="overflow-x-auto rounded-lg shadow bg-white">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/img/logo.png';
 import instance from '../API/axios'; // Thêm dòng này
 
 export const Register = () => {

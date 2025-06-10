@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./log.scss";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
 import Datatable from "../../components/datatable/datatable.jsx";

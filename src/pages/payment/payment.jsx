@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
-import "./payment.scss";
 import instance from "../../API/axios";
 
 const Payment = () => {
@@ -29,21 +28,20 @@ const Payment = () => {
     fetchInvoices();
   }, []);
 
-
   // Hàm xuất hóa đơn
   const handleExportInvoice = async () => {
-    if (!form.customerId || !form.roomId) {
-      alert("Vui lòng nhập Customer ID và Room ID!");
+    if (!form.customerId || !form.bookingId) {
+      alert("Vui lòng nhập Customer ID và Booking ID!");
       return;
     }
     try {
       const payload = {
         invoiceId: 0,
-        bookingId: Number(form.roomId), // mapping roomId to bookingId nếu không có bookingId riêng
+        bookingId: Number(form.bookingId),
         customerId: Number(form.customerId),
-        status: 0,
-        totalAmount: 0,
-        createdAt: new Date().toISOString(),
+        status: Number(form.status),
+        totalAmount: Number(form.totalAmount),
+        createdAt: new Date(form.createdAt).toISOString(),
       };
       await instance.post("/Invoice", payload);
       alert("Xuất hóa đơn thành công!");
@@ -60,119 +58,129 @@ const Payment = () => {
   };
 
   return (
-    <div className="payment">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="paymentContainer">
+      <div className="flex-1 flex flex-col">
         <Navbar />
-        <h1 className="title">Nhập hóa đơn</h1>
-        <form className="paymentForm pretty-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label>Invoice ID</label>
-              <input
-                type="number"
-                placeholder="Nhập Invoice ID"
-                value={form.invoiceId}
-                onChange={(e) => setForm({ ...form, invoiceId: Number(e.target.value) })}
-                required
-              />
+        <div className="flex-1 p-6 flex flex-col items-center">
+          <h1 className="text-2xl font-bold text-blue-700 mb-6">Nhập hóa đơn</h1>
+          <form className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Invoice ID</label>
+                <input
+                  type="number"
+                  placeholder="Nhập Invoice ID"
+                  value={form.invoiceId}
+                  onChange={(e) => setForm({ ...form, invoiceId: Number(e.target.value) })}
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Booking ID</label>
+                <input
+                  type="number"
+                  placeholder="Nhập Booking ID"
+                  value={form.bookingId}
+                  onChange={(e) => setForm({ ...form, bookingId: Number(e.target.value) })}
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Customer ID</label>
+                <input
+                  type="number"
+                  placeholder="Nhập Customer ID"
+                  value={form.customerId}
+                  onChange={(e) => setForm({ ...form, customerId: Number(e.target.value) })}
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Status</label>
+                <input
+                  type="number"
+                  placeholder="Nhập Status"
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: Number(e.target.value) })}
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Total Amount</label>
+                <input
+                  type="number"
+                  placeholder="Nhập Total Amount"
+                  value={form.totalAmount}
+                  onChange={(e) => setForm({ ...form, totalAmount: Number(e.target.value) })}
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="font-medium text-gray-700">Created At</label>
+                <input
+                  type="datetime-local"
+                  value={form.createdAt.slice(0, 16)}
+                  onChange={(e) =>
+                    setForm({ ...form, createdAt: new Date(e.target.value).toISOString() })
+                  }
+                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  required
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label>Booking ID</label>
-              <input
-                type="number"
-                placeholder="Nhập Booking ID"
-                value={form.bookingId}
-                onChange={(e) => setForm({ ...form, bookingId: Number(e.target.value) })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Customer ID</label>
-              <input
-                type="number"
-                placeholder="Nhập Customer ID"
-                value={form.customerId}
-                onChange={(e) => setForm({ ...form, customerId: Number(e.target.value) })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Status</label>
-              <input
-                type="number"
-                placeholder="Nhập Status"
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: Number(e.target.value) })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Total Amount</label>
-              <input
-                type="number"
-                placeholder="Nhập Total Amount"
-                value={form.totalAmount}
-                onChange={(e) => setForm({ ...form, totalAmount: Number(e.target.value) })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Created At</label>
-              <input
-                type="datetime-local"
-                value={form.createdAt.slice(0, 16)}
-                onChange={(e) =>
-                  setForm({ ...form, createdAt: new Date(e.target.value).toISOString() })
-                }
-                required
-              />
-            </div>
-            <div className="form-group">
+            <div className="flex justify-end mt-6">
               <button
                 type="button"
-                className="submit-btn"
+                className="bg-blue-600 text-white font-semibold px-6 py-2 rounded hover:bg-blue-700 transition"
                 onClick={handleExportInvoice}
               >
                 Xuất hóa đơn
               </button>
             </div>
-          </div>
-        </form>
-        <div className="paymentTable pretty-table">
-          <h2>Danh sách hóa đơn</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Invoice ID</th>
-                <th>Booking ID</th>
-                <th>Customer ID</th>
-                <th>Status</th>
-                <th>Total Amount</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.length === 0 ? (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: "center", color: "#aaa" }}>
-                    Chưa có hóa đơn
-                  </td>
-                </tr>
-              ) : (
-                invoices.map((inv, idx) => (
-                  <tr key={idx}>
-                    <td>{inv.invoiceId}</td>
-                    <td>{inv.bookingId}</td>
-                    <td>{inv.customerId}</td>
-                    <td>{inv.status}</td>
-                    <td>{inv.totalAmount}</td>
-                    <td>{inv.createdAt}</td>
+          </form>
+          <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-blue-600">Danh sách hóa đơn</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200 rounded-lg">
+                <thead>
+                  <tr className="bg-blue-50">
+                    <th className="px-3 py-2 border-b text-left">Invoice ID</th>
+                    <th className="px-3 py-2 border-b text-left">Booking ID</th>
+                    <th className="px-3 py-2 border-b text-left">Customer ID</th>
+                    <th className="px-3 py-2 border-b text-left">Status</th>
+                    <th className="px-3 py-2 border-b text-left">Total Amount</th>
+                    <th className="px-3 py-2 border-b text-left">Created At</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {invoices.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4 text-gray-400">
+                        Chưa có hóa đơn
+                      </td>
+                    </tr>
+                  ) : (
+                    invoices.map((inv, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-3 py-2 border-b">{inv.invoiceId}</td>
+                        <td className="px-3 py-2 border-b">{inv.bookingId}</td>
+                        <td className="px-3 py-2 border-b">{inv.customerId}</td>
+                        <td className="px-3 py-2 border-b">{inv.status}</td>
+                        <td className="px-3 py-2 border-b">{inv.totalAmount}</td>
+                        <td className="px-3 py-2 border-b">{inv.createdAt}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

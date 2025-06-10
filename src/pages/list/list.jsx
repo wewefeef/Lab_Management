@@ -28,11 +28,22 @@ const List = ({ columns }) => {
   };
 
   return (
-    <div className="list">
+    <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="listContainer">
+      <div className="flex-1 flex flex-col">
         <Navbar />
-        <Datatable columns={columns} />
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">Danh sách</h1>
+            <button
+              onClick={handleAddNew}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            >
+              Thêm mới
+            </button>
+          </div>
+          <Datatable columns={columns} />
+        </div>
       </div>
     </div>
   );

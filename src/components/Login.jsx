@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../assets/css/style.css';
-import logo from '../assets/img/logo.png';
 import instance from '../API/axios'; // Thêm dòng này
 
 export const Login = () => {
@@ -40,22 +39,19 @@ export const Login = () => {
             return;
         }
 
-        const payload = {
-            username,
-            password
-        };
-        console.log('Payload:', payload);
-
+        const payload = { username, password };
         try {
             const response = await instance.post('/login', payload);
             const data = response.data;
-
-            // Lưu token và thông tin user vào localStorage
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
 
-            // Điều hướng đến trang home sau khi đăng nhập thành công
-            navigate('/home');
+            // Điều hướng theo vai trò
+            if (data.user.role?.roleName === "Admin") {
+                navigate('/admin');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.response?.data?.error || err.message || 'Login failed');
             console.error('Login error:', err);

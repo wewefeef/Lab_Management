@@ -3,7 +3,6 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Login } from './components/Login.jsx';
 import { Register } from './components/Register.jsx';
-import Home from "./pages/home/home.jsx";
 import DashboardAdmin from "./pages/dashboard-admin/dashboard-admin.jsx";
 import Single from "./pages/single/single.jsx";
 import Customer from './pages/customer/Customer.jsx';
@@ -20,6 +19,15 @@ import CheckinCheckout from "./pages/checkincheckout/checkincheckout.jsx";
 import Notification from "./pages/notification/notification.jsx";
 import Users from "./pages/users/users.jsx";
 import { LogProvider } from "./logContext.js";
+import MainHome from "./pages/home/MainHome.jsx";
+import Header from './pages/home/Header.jsx';
+import IntroSection from "./pages/home/IntroSection.jsx";
+import WhyChooseUs from "./pages/home/WhyChooseUs.jsx";
+import HotelList from "./pages/home/hotellist.jsx";
+import TestimonialSection from "./pages/home/TestimonialSection.jsx";
+import Footer from "./pages/home/Footer.jsx";
+
+
 
 function App() {
   return (
@@ -32,7 +40,9 @@ function App() {
           {/* Trang đăng nhập, đăng ký */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<MainHome />} />
+          <Route path="/home" element={<MainHome />} />
+          <Route path="/mainhome" element={<MainHome />} /> {/* Thêm dòng này nếu muốn truy cập /mainhome */}
 
           {/* Trang dịch vụ và checkincheckout */}
           <Route path="/services" element={<Services />} />
@@ -43,7 +53,12 @@ function App() {
           <Route path="/navbar" element={<Navbar />} />
 
           {/* Trang chính */}
-          <Route path="/home" element={<Home />} />
+          <Route path="/header" element={<Header />} />
+          <Route path="/intro" element={<IntroSection />} />
+          <Route path="/whychooseus" element={<WhyChooseUs />} />
+          <Route path="/testimonial" element={<TestimonialSection />} />
+          <Route path="/footer" element={<Footer />} />
+          <Route path="/hotellist" element={<HotelList />} />
 
           {/* Users */}
           <Route path="/users" element={<Users />} />

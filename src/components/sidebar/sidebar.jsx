@@ -18,7 +18,13 @@ const Sidebar = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => setShowConfirmation(true);
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // ...xóa các thông tin khác nếu có...
+    navigate('/login');
+};
+
   const confirmLogout = () => {
     logout();
     setShowConfirmation(false);
@@ -37,7 +43,7 @@ const Sidebar = () => {
         <ul className="space-y-1">
           <li>
             <NavLink
-              to="/home"
+              to="/admin"
               className={({ isActive }) =>
                 `flex items-center gap-8 pl-8 pr-4 py-3 rounded-xl font-medium transition
             ${
@@ -187,12 +193,6 @@ const Sidebar = () => {
               <ExitToAppIcon fontSize="medium" />
               <span>Đăng xuất</span>
             </button>
-          </li>
-          <li>
-            <div className="flex items-center gap-8 pl-8 pr-4 py-3 text-gray-500 text-base rounded-xl">
-              <SettingsApplicationsIcon fontSize="medium" />
-              <span>Cài đặt</span>
-            </div>
           </li>
         </ul>
       </nav>
