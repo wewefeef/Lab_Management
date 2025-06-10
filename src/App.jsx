@@ -25,6 +25,7 @@ import WhyChooseUs from "./pages/home/WhyChooseUs.jsx";
 import HotelList from "./pages/home/hotellist.jsx";
 import TestimonialSection from "./pages/home/TestimonialSection.jsx";
 import Footer from "./pages/home/Footer.jsx";
+import BookRoom from "./pages/home/bookRoom.jsx"; 
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
 
           {/* Rooms */}
           <Route path="/rooms" element={<Rooms />} />
+          <Route path="/bookRoom/:roomId" element={<BookRoom />} />
 
           {/* Notification */}
           <Route path="/notification" element={<Notification />} />
