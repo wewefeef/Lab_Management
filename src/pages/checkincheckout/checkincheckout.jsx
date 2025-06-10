@@ -48,8 +48,15 @@ const CheckInOut = () => {
       };
       const endpoint = type === "checkin" ? "/CheckIn" : "/CheckOut";
       await instance.post(endpoint, payload);
-      alert(type === "checkin" ? "Check-in thành công!" : "Check-out thành công!");
-      setForm({ customerId: "", roomId: "", checkInDate: "", checkOutDate: "" });
+      alert(
+        type === "checkin" ? "Check-in thành công!" : "Check-out thành công!"
+      );
+      setForm({
+        customerId: "",
+        roomId: "",
+        checkInDate: "",
+        checkOutDate: "",
+      });
       const res = await instance.get("/CheckInOut");
       setRecords(res.data);
     } catch (err) {
@@ -64,9 +71,9 @@ const CheckInOut = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 p-4 flex flex-col">
         <Navbar />
-        <div className="max-w-3xl mx-auto w-full mt-8">
+        <div className="w-full mt-8">
           <h1 className="text-2xl font-bold mb-6 text-blue-700 text-center">
             Nhập thông tin Check-in/Check-out
           </h1>
@@ -78,7 +85,9 @@ const CheckInOut = () => {
                   type="number"
                   placeholder="Nhập Customer ID"
                   value={form.customerId}
-                  onChange={(e) => setForm({ ...form, customerId: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, customerId: e.target.value })
+                  }
                   required
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -95,21 +104,29 @@ const CheckInOut = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="font-medium text-gray-700">Check In Date</label>
+                <label className="font-medium text-gray-700">
+                  Check In Date
+                </label>
                 <input
                   type="datetime-local"
                   value={form.checkInDate}
-                  onChange={(e) => setForm({ ...form, checkInDate: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, checkInDate: e.target.value })
+                  }
                   required
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="font-medium text-gray-700">Check Out Date</label>
+                <label className="font-medium text-gray-700">
+                  Check Out Date
+                </label>
                 <input
                   type="datetime-local"
                   value={form.checkOutDate}
-                  onChange={(e) => setForm({ ...form, checkOutDate: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, checkOutDate: e.target.value })
+                  }
                   required
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -140,16 +157,25 @@ const CheckInOut = () => {
               <table className="min-w-full border border-gray-200">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="py-2 px-4 border-b text-left">Customer ID</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Customer ID
+                    </th>
                     <th className="py-2 px-4 border-b text-left">Room ID</th>
-                    <th className="py-2 px-4 border-b text-left">Check In Date</th>
-                    <th className="py-2 px-4 border-b text-left">Check Out Date</th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Check In Date
+                    </th>
+                    <th className="py-2 px-4 border-b text-left">
+                      Check Out Date
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {records.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="text-center py-4 text-gray-500">
+                      <td
+                        colSpan={4}
+                        className="text-center py-4 text-gray-500"
+                      >
                         Chưa có dữ liệu
                       </td>
                     </tr>

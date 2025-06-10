@@ -6,6 +6,7 @@ import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import instance from "../../API/axios";
 
 const Widget = ({ type }) => {
   const [amount, setAmount] = useState(0);
@@ -16,10 +17,10 @@ const Widget = ({ type }) => {
   switch (type) {
     case "user":
       data = {
-        title: "USERS",
+        title: "Khách Hàng",
         isMoney: false,
-        linkto: "/user",
-        link: "See all users",
+        linkto: "/customers",
+        link: "Xem tất cả khách hàng",
         icon: (
           <PersonOutlinedIcon
             className="icon"
@@ -29,16 +30,16 @@ const Widget = ({ type }) => {
             }}
           />
         ),
-        api: "/user",
+        api: "/Customer",
         getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "order":
       data = {
-        title: "Rooms",
+        title: "Phòng",
         isMoney: false,
-        linkto: "/room",
-        link: "View all rooms",
+        linkto: "/rooms",
+        link: "Xem tất cả phòng",
         icon: (
           <ShoppingCartOutlinedIcon
             className="icon"
@@ -48,32 +49,32 @@ const Widget = ({ type }) => {
             }}
           />
         ),
-        api: "/room",
+        api: "/Room",
         getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "earning":
       data = {
-        title: "Service",
+        title: "Dịch Vụ",
         isMoney: false,
-        linkto: "/service",
-        link: "View",
+        linkto: "/services",
+        link: "Xem dịch vụ",
         icon: (
           <MonetizationOnOutlinedIcon
             className="icon"
             style={{ backgroundColor: "rgba(0, 128, 0, 0.2)", color: "green" }}
           />
         ),
-        api: "/service",
+        api: "/Service",
         getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     case "balance":
       data = {
-        title: "Payment",
-        isMoney: true,
-        linkto: "/payment",
-        link: "See details",
+        title: "Người Dùng",
+        isMoney: false,
+        linkto: "/user",
+        link: "Xem tất cả tài khoản",
         icon: (
           <AccountBalanceWalletOutlinedIcon
             className="icon"
@@ -83,11 +84,8 @@ const Widget = ({ type }) => {
             }}
           />
         ),
-        api: "/invoice",
-        getValue: (res) =>
-          Array.isArray(res)
-            ? res.reduce((sum, item) => sum + (item.amount || 0), 0)
-            : 0,
+        api: "/User",
+        getValue: (res) => (Array.isArray(res) ? res.length : 0),
       };
       break;
     default:
@@ -97,13 +95,9 @@ const Widget = ({ type }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(data.api, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const result = await res.json();
-        setAmount(data.getValue(result));
-        setDiff(20); // Tạm thời giữ 20% như mẫu, có thể sửa sau
+        const res = await instance.get(data.api);
+        setAmount(data.getValue(res.data));
+        setDiff(20); // Tạm thời giữ 20%
       } catch (e) {
         setAmount(0);
         setDiff(0);
@@ -117,7 +111,7 @@ const Widget = ({ type }) => {
       <div className="left">
         <span className="title">{data.title}</span>
         <span className="counter">
-          {data.isMoney && "$"} {amount}
+          {data.isMoney && "₫"} {amount}
         </span>
         <Link to={data.linkto || "#"} className="link-to">
           <span className="link">{data.link}</span>

@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/navbar";
 import Widget from "../../components/widget/widget";
-import Featured from "../../components/featured/featured";
-import Chart from "../../components/chart/chart";
 
 const DashboardAdmin = () => {
   const navigate = useNavigate();
@@ -36,15 +34,6 @@ const DashboardAdmin = () => {
             <Widget type="order" />
             <Widget type="earning" />
             <Widget type="balance" />
-          </div>
-          {/* Charts */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-1 bg-white rounded-lg shadow p-4">
-              <Featured />
-            </div>
-            <div className="flex-1 bg-white rounded-lg shadow p-4">
-              <Chart title="Last 6 Months (Revenue)" aspect={2 / 1} />
-            </div>
           </div>
         </div>
       </div>

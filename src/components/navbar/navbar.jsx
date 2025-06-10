@@ -1,13 +1,8 @@
 import "./navbar.scss";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { DarkModeContext } from "../../context/darkModeContext";
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const { dispatch } = useContext(DarkModeContext);
-  const { user } = useContext(AuthContext);
 
   return (
     <div className="navbar">

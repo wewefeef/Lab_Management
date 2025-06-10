@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Login } from './components/Login.jsx';
 import { Register } from './components/Register.jsx';
 import DashboardAdmin from "./pages/dashboard-admin/dashboard-admin.jsx";
-import Single from "./pages/single/single.jsx";
 import Customer from './pages/customer/Customer.jsx';
 import New from "./pages/new/new.jsx";
 import { NotificationInputs, productInputs, userInputs } from "./formSource.js";
@@ -60,22 +59,17 @@ function App() {
 
           {/* Users */}
           <Route path="/users" element={<Users />} />
-          <Route path="/users/:userId" element={<Single />} />
           <Route path="/newUser" element={<New inputs={userInputs} title="Add New User" />} />
 
           {/* Rooms */}
           <Route path="/rooms" element={<Rooms />} />
-          {/* <Route path="/rooms/new" element={<Rooms />} /> */} {/* XÓA hoặc COMMENT dòng này */}
-          <Route path="/rooms/:roomId" element={<Single />} />
 
           {/* Notification */}
           <Route path="/notification" element={<Notification />} />
-          <Route path="/notification/:notificationId" element={<Single />} />
           <Route path="/newNotification" element={<New inputs={NotificationInputs} title="Add New Notification" />} />
 
           {/* Logs */}
           <Route path="/log" element={<Log />} />
-          <Route path="/log/:logId" element={<Single />} />
           <Route path="/newLog" element={<New inputs={productInputs} title="Add New Log" />} />
 
           {/* Payment */}

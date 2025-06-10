@@ -36,7 +36,10 @@ const Rooms = () => {
       });
       setRooms(res.data);
     } catch (err) {
-      alert("Không lấy được danh sách phòng: " + (err.response?.data?.error || err.message));
+      alert(
+        "Không lấy được danh sách phòng: " +
+          (err.response?.data?.error || err.message)
+      );
     }
   };
 
@@ -45,7 +48,8 @@ const Rooms = () => {
   }, []);
 
   const handleAddRoom = async () => {
-    const { roomNumber, roomType, price, status, description, imageUrl } = newRoom;
+    const { roomNumber, roomType, price, status, description, imageUrl } =
+      newRoom;
     if (
       roomNumber &&
       roomType &&
@@ -82,7 +86,9 @@ const Rooms = () => {
         alert(`Đã thêm phòng ${roomNumber} thành công!`);
         fetchRooms();
       } catch (err) {
-        alert("Thêm phòng thất bại: " + (err.response?.data?.error || err.message));
+        alert(
+          "Thêm phòng thất bại: " + (err.response?.data?.error || err.message)
+        );
       }
     } else {
       alert("Vui lòng nhập đầy đủ thông tin!");
@@ -126,27 +132,29 @@ const Rooms = () => {
         fetchRooms();
         alert("Đã xóa phòng thành công!");
       } catch (err) {
-        alert("Xóa phòng thất bại: " + (err.response?.data?.error || err.message));
+        alert(
+          "Xóa phòng thất bại: " + (err.response?.data?.error || err.message)
+        );
       }
     }
   };
 
-  const filteredRooms = rooms.filter(room =>
+  const filteredRooms = rooms.filter((room) =>
     room.roomNumber.toString().includes(searchRoomNumber)
   );
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 p-4 flex flex-col">
         <Navbar />
         {/* Thanh tìm kiếm và nút thêm phòng */}
-        <div className="flex items-center gap-4 my-6">
+        <div className="flex items-center gap-4 my-6 w-full">
           <input
             type="text"
             placeholder="Tìm kiếm theo số phòng..."
             value={searchRoomNumber}
-            onChange={e => setSearchRoomNumber(e.target.value)}
+            onChange={(e) => setSearchRoomNumber(e.target.value)}
             className="w-56 px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
@@ -159,14 +167,18 @@ const Rooms = () => {
         {/* Form thêm phòng */}
         {showAddForm && (
           <div className="bg-white rounded-2xl shadow-lg p-8 my-6 w-full max-w-2xl mx-auto">
-            <h2 className="text-xl font-bold mb-4 text-blue-700">Thêm phòng mới</h2>
+            <h2 className="text-xl font-bold mb-4 text-blue-700">
+              Thêm phòng mới
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <label className="font-medium text-gray-700">Số phòng</label>
                 <input
                   type="text"
                   value={newRoom.roomNumber}
-                  onChange={(e) => setNewRoom({ ...newRoom, roomNumber: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, roomNumber: e.target.value })
+                  }
                   placeholder="Nhập số phòng"
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -176,7 +188,9 @@ const Rooms = () => {
                 <input
                   type="text"
                   value={newRoom.roomType}
-                  onChange={(e) => setNewRoom({ ...newRoom, roomType: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, roomType: e.target.value })
+                  }
                   placeholder="Nhập loại phòng (VIP/Thường)"
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -186,7 +200,9 @@ const Rooms = () => {
                 <input
                   type="number"
                   value={newRoom.price}
-                  onChange={(e) => setNewRoom({ ...newRoom, price: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, price: e.target.value })
+                  }
                   placeholder="Nhập giá (USD)"
                   min={0}
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -197,7 +213,9 @@ const Rooms = () => {
                 <input
                   type="number"
                   value={newRoom.status}
-                  onChange={(e) => setNewRoom({ ...newRoom, status: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, status: e.target.value })
+                  }
                   placeholder="Nhập trạng thái (0: Còn trống, 1: Đã đặt)"
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -207,17 +225,23 @@ const Rooms = () => {
                 <input
                   type="text"
                   value={newRoom.description}
-                  onChange={(e) => setNewRoom({ ...newRoom, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, description: e.target.value })
+                  }
                   placeholder="Nhập mô tả"
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
               </div>
               <div className="flex flex-col gap-1 md:col-span-2">
-                <label className="font-medium text-gray-700">Ảnh phòng (imageUrl)</label>
+                <label className="font-medium text-gray-700">
+                  Ảnh phòng (imageUrl)
+                </label>
                 <input
                   type="text"
                   value={newRoom.imageUrl}
-                  onChange={(e) => setNewRoom({ ...newRoom, imageUrl: e.target.value })}
+                  onChange={(e) =>
+                    setNewRoom({ ...newRoom, imageUrl: e.target.value })
+                  }
                   placeholder="Nhập đường dẫn ảnh"
                   className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
@@ -232,8 +256,10 @@ const Rooms = () => {
           </div>
         )}
         {/* Bảng danh sách phòng */}
-        <div className="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-6 mx-auto">
-          <h2 className="text-xl font-bold mb-4 text-blue-700">Danh sách phòng</h2>
+        <div className="w-full bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-4 text-blue-700">
+            Danh sách phòng
+          </h2>
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-200 rounded-lg">
               <thead>
@@ -251,18 +277,28 @@ const Rooms = () => {
               <tbody>
                 {filteredRooms.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-4 text-gray-400">Không có phòng nào</td>
+                    <td colSpan="8" className="text-center py-4 text-gray-400">
+                      Không có phòng nào
+                    </td>
                   </tr>
                 ) : (
                   filteredRooms.map((room, idx) => (
-                    <tr key={room._id || room.roomNumber} className="hover:bg-gray-50">
+                    <tr
+                      key={room._id || room.roomNumber}
+                      className="hover:bg-gray-50"
+                    >
                       <td className="px-3 py-2 border-b">{idx + 1}</td>
                       <td className="px-3 py-2 border-b">
                         {editRoomId === (room._id || room.roomNumber) ? (
                           <input
                             type="text"
                             value={editRoomData.roomNumber}
-                            onChange={e => setEditRoomData({ ...editRoomData, roomNumber: e.target.value })}
+                            onChange={(e) =>
+                              setEditRoomData({
+                                ...editRoomData,
+                                roomNumber: e.target.value,
+                              })
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-20"
                           />
                         ) : (
@@ -274,7 +310,12 @@ const Rooms = () => {
                           <input
                             type="text"
                             value={editRoomData.roomType}
-                            onChange={e => setEditRoomData({ ...editRoomData, roomType: e.target.value })}
+                            onChange={(e) =>
+                              setEditRoomData({
+                                ...editRoomData,
+                                roomType: e.target.value,
+                              })
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-24"
                           />
                         ) : (
@@ -286,7 +327,12 @@ const Rooms = () => {
                           <input
                             type="text"
                             value={editRoomData.description}
-                            onChange={e => setEditRoomData({ ...editRoomData, description: e.target.value })}
+                            onChange={(e) =>
+                              setEditRoomData({
+                                ...editRoomData,
+                                description: e.target.value,
+                              })
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-32"
                           />
                         ) : (
@@ -298,7 +344,12 @@ const Rooms = () => {
                           <input
                             type="number"
                             value={editRoomData.price}
-                            onChange={e => setEditRoomData({ ...editRoomData, price: e.target.value })}
+                            onChange={(e) =>
+                              setEditRoomData({
+                                ...editRoomData,
+                                price: e.target.value,
+                              })
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-20"
                           />
                         ) : (
@@ -310,7 +361,12 @@ const Rooms = () => {
                           <input
                             type="number"
                             value={editRoomData.status}
-                            onChange={e => setEditRoomData({ ...editRoomData, status: e.target.value })}
+                            onChange={(e) =>
+                              setEditRoomData({
+                                ...editRoomData,
+                                status: e.target.value,
+                              })
+                            }
                             className="border border-gray-300 rounded px-2 py-1 w-16"
                           />
                         ) : (
@@ -351,7 +407,9 @@ const Rooms = () => {
                           <span className="h-4"></span>
                           <FaTrash
                             className="text-red-500 cursor-pointer text-xl mt-1 hover:text-red-700 transition"
-                            onClick={() => handleDeleteRoom(room._id || room.roomNumber)}
+                            onClick={() =>
+                              handleDeleteRoom(room._id || room.roomNumber)
+                            }
                             title="Xóa phòng"
                           />
                         </div>
