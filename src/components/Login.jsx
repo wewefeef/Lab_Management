@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../assets/css/style.css";
-import instance from "../API/axios";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { state } = location;
@@ -16,16 +16,18 @@ export const Login = () => {
     if (state && state.username && state.password) {
       setUsername(state.username);
       setPassword(state.password);
+      setSuccess("Đăng ký thành công! Vui lòng đăng nhập.");
     }
-    // Nếu đã có token thì chuyển hướng về trang chủ
+    // Nếu đã có token thì chuyển hướng về dashboard
     if (localStorage.getItem("token")) {
-      navigate("/");
+      navigate("/admin");
     }
   }, [navigate, state]);
 
   const login = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
     // Kiểm tra nhập đủ thông tin
     if (!username || !password) {
@@ -39,126 +41,121 @@ export const Login = () => {
       return;
     }
 
-    const payload = { username, password };
-    try {
-      const response = await instance.post("/login", payload);
-      const data = response.data;
-      // Kiểm tra dữ liệu trả về
-      if (!data.token || !data.username) {
-        setError("Sai tài khoản hoặc mật khẩu!");
-        return;
-      }
-      // Sau khi đăng nhập thành công:
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.userId); // <-- Lưu userId đúng key
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("roleId", data.roleId);
-      localStorage.setItem("email", data.email);
-      navigate("/"); // hoặc navigate("/admin")
-    } catch (err) {
-      setError(
-        err.response?.data?.error ||
-          err.message ||
-          "Đăng nhập thất bại. Vui lòng thử lại."
-      );
-      console.error("Lỗi đăng nhập:", err);
+    // Lấy danh sách user từ localStorage
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const foundUser = users.find(
+      (u) => (u.email === username || u.username === username) && u.password === password
+    );
+
+    if (foundUser) {
+      localStorage.setItem("token", "fake-token");
+      localStorage.setItem("username", foundUser.email);
+      setSuccess("Đăng nhập thành công! Đang chuyển hướng...");
+      setTimeout(() => {
+        navigate("/admin");
+      }, 1200);
+    } else {
+      setError("Sai tài khoản hoặc mật khẩu!");
     }
   };
 
   return (
-    <div className="container">
-      <section className="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-        <div className="container">
-          <div className="row justify-content-center">
-            <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-              <div className="card mb-3">
-                <div className="card-body">
-                  <div className="pt-4 pb-2">
-                    <h5 className="card-title text-center pb-0 fs-4">
-                      Đăng nhập tài khoản
-                    </h5>
-                    <p className="text-center small">
-                      Nhập tên đăng nhập và mật khẩu để đăng nhập
-                    </p>
-                  </div>
-                  <form className="row g-3 needs-validation" onSubmit={login}>
-                    <div className="col-12">
-                      <label htmlFor="username" className="form-label">
-                        Tên đăng nhập
-                      </label>
-                      <div className="input-group has-validation">
-                        <input
-                          type="text"
-                          name="username"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          className="form-control"
-                          id="username"
-                          required
-                        />
-                        <div className="invalid-feedback">
-                          Vui lòng nhập tên đăng nhập.
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <label htmlFor="password" className="form-label">
-                        Mật khẩu
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="form-control"
-                        id="password"
-                        required
-                      />
-                      <div className="invalid-feedback">
-                        Vui lòng nhập mật khẩu!
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="form-check">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          name="remember"
-                          value="true"
-                          id="rememberMe"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="rememberMe"
-                        >
-                          Ghi nhớ đăng nhập
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <button className="btn btn-primary w-100" type="submit">
-                        Đăng nhập
-                      </button>
-                    </div>
-                    <div className="col-12">
-                      <p className="small mb-0 text-center">
-                        Chưa có tài khoản?{" "}
-                        <Link
-                          to="/register"
-                          onClick={() => console.log("Nhấn tạo tài khoản mới")}
-                        >
-                          Đăng ký ngay
-                        </Link>
-                      </p>
-                    </div>
-                  </form>
-                  {error && <p className="text-danger text-center">{error}</p>}
-                </div>
-              </div>
+    <div style={{ background: "#4287f5", minHeight: "100vh" }}>
+      <div
+        style={{
+          maxWidth: 400,
+          margin: "0 auto",
+          paddingTop: 100,
+          paddingBottom: 100,
+        }}
+      >
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 10,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            padding: 32,
+          }}
+        >
+          <h2
+            style={{
+              color: "#1877f2",
+              fontWeight: 700,
+              textAlign: "center",
+              marginBottom: 8,
+            }}
+          >
+            Đăng nhập
+          </h2>
+          <div
+            style={{
+              textAlign: "center",
+              color: "#444",
+              marginBottom: 24,
+              fontSize: 15,
+            }}
+          >
+            Chào mừng bạn đến với trang Web Quản lý phòng LAB.
+          </div>
+          <form onSubmit={login}>
+            <div className="mb-3">
+              <label className="form-label" htmlFor="username">
+                Username/Email <span style={{ color: "red" }}>*</span>
+              </label>
+              <input
+                id="username"
+                type="text"
+                className="form-control"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="abc123@gmail.com"
+                required
+              />
             </div>
+            <div className="mb-3">
+              <label className="form-label" htmlFor="password">
+                Mật khẩu <span style={{ color: "red" }}>*</span>
+              </label>
+              <input
+                id="password"
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="******"
+                required
+              />
+            </div>
+            <div className="mb-3 text-end">
+              <Link to="#" style={{ fontSize: 13 }}>
+                Quên mật khẩu?
+              </Link>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              style={{ fontWeight: 600, fontSize: 17 }}
+            >
+              Đăng nhập
+            </button>
+            {error && (
+              <div className="text-danger text-center mt-2">{error}</div>
+            )}
+            {success && (
+              <div className="text-success text-center mt-2">{success}</div>
+            )}
+          </form>
+          <div
+            className="text-center mt-3"
+            style={{ fontSize: 15, color: "#444" }}
+          >
+            Bạn chưa có tài khoản?{" "}
+            <Link to="/register" style={{ color: "#1877f2", fontWeight: 600 }}>
+              Tạo tài khoản ngay
+            </Link>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

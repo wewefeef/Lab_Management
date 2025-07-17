@@ -1,134 +1,76 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+import DevicesOtherIcon from "@mui/icons-material/DevicesOther";
+import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
-import MiscellaneousServicesIcon from "@mui/icons-material/MiscellaneousServices";
-import RoomServiceIcon from "@mui/icons-material/RoomService";
-import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import PeopleIcon from "@mui/icons-material/People";
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebarOpen }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const navigate = useNavigate();
 
-  // Lấy roleId trực tiếp từ localStorage (vì bạn lưu là key riêng)
-  let roleId = localStorage.getItem("roleId");
-  if (roleId) {
-    roleId = parseInt(roleId, 10);
-  } else {
-    roleId = null;
-  }
-
-  // Nếu không có roleId (chưa đăng nhập), chuyển hướng về login và không render sidebar
-  if (!roleId) {
-    navigate("/login");
-    return null;
-  }
-
-  // Định nghĩa các menu
-  const menus = [
-    {
-      key: "dashboard",
-      to: "/admin",
-      icon: <DashboardIcon fontSize="medium" />,
-      label: "Bảng điều khiển",
-      roles: [1],
-    },
-    {
-      key: "users",
-      to: "/users",
-      icon: <PersonOutlineIcon fontSize="medium" />,
-      label: "Người dùng",
-      roles: [1],
-    },
-    {
-      key: "rooms",
-      to: "/rooms",
-      icon: <MeetingRoomIcon fontSize="medium" />,
-      label: "Phòng",
-      roles: [1, 2],
-    },
-    {
-      key: "services",
-      to: "/services",
-      icon: <MiscellaneousServicesIcon fontSize="medium" />,
-      label: "Dịch vụ",
-      roles: [1, 2],
-    },
-    {
-      key: "checkincheckout",
-      to: "/checkincheckout",
-      icon: <RoomServiceIcon fontSize="medium" />,
-      label: "Nhận/Trả phòng",
-      roles: [1, 2, 4],
-    },
-    {
-      key: "payment",
-      to: "/payment",
-      icon: <CreditCardIcon fontSize="medium" />,
-      label: "Thanh toán",
-      roles: [1, 2, 3, 4],
-    },
-    {
-      key: "customer",
-      to: "/customer",
-      icon: <PeopleIcon fontSize="medium" />,
-      label: "Khách hàng",
-      roles: [1, 2],
-    },
-    {
-      key: "notification",
-      to: "/notification",
-      icon: <NotificationsNoneIcon fontSize="medium" />,
-      label: "Thông báo",
-      roles: [1],
-    },
-    {
-      key: "log",
-      to: "/log",
-      icon: <PsychologyOutlinedIcon fontSize="medium" />,
-      label: "Nhật ký",
-      roles: [1],
-    },
+  const topMenus = [
+    { key: "dashboard", to: "/admin", icon: <DashboardIcon fontSize="medium" />, label: "Dashboard" },
+    { key: "calendar", to: "/calendar", icon: <CalendarTodayIcon fontSize="medium" />, label: "Calendar" },
+    { key: "tasks", to: "/tasks", icon: <AssignmentIcon fontSize="medium" />, label: "Tasks" },
+    { key: "user", to: "/users", icon: <PersonOutlineIcon fontSize="medium" />, label: "User" },
+  ];
+  const middleMenus = [
+    { key: "project", to: "/project", icon: <WorkOutlineIcon fontSize="medium" />, label: "Project" },
+    { key: "event", to: "/event", icon: <EventNoteIcon fontSize="medium" />, label: "Event" },
+    { key: "device", to: "/device", icon: <DevicesOtherIcon fontSize="medium" />, label: "Device" },
+    { key: "borrow", to: "/borrow", icon: <AssignmentReturnIcon fontSize="medium" />, label: "Borrow" },
+    { key: "kpi", to: "/kpi", icon: <AssessmentIcon fontSize="medium" />, label: "KPI" },
+    { key: "task2", to: "/task2", icon: <AssignmentIcon fontSize="medium" />, label: "Task" },
+  ];
+  const bottomMenus = [
+    { key: "setting", to: "/setting", icon: <SettingsIcon fontSize="medium" />, label: "Setting" },
   ];
 
-  // Lọc menu theo roleId
-  const filteredMenus = menus.filter((item) => item.roles.includes(roleId));
-
-  const handleLogout = () => {
+  const handleLogout = () => setShowConfirmation(true);
+  const confirmLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
-  };
-
-  const confirmLogout = () => {
     setShowConfirmation(false);
     navigate("/login", { replace: true });
   };
   const cancelLogout = () => setShowConfirmation(false);
 
   return (
-    <div className="bg-white h-screen w-80 flex-shrink-0 flex flex-col py-8 border-r border-gray-100 shadow overflow-visible">
-      <div className="flex items-center justify-center mb-8">
-        <span className="font-extrabold text-2xl text-violet-700 tracking-wide drop-shadow">
-          Booking
-        </span>
-      </div>
-      <nav className="flex-1 w-full">
-        <ul className="space-y-1">
-          {filteredMenus.map((item) => (
+    <div
+      className="bg-white flex flex-col transition-all duration-200 shadow"
+      style={{
+        width: 256,
+        height: "100vh",
+        position: "fixed",
+        left: 0,
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      <div className="flex flex-col h-full px-0 py-6">
+        <div className="flex items-center justify-center mb-8">
+          <span className="font-extrabold text-xl text-gray-800 tracking-wide drop-shadow">
+            Task Management
+          </span>
+        </div>
+        <ul className="flex flex-col gap-1 px-4">
+          {topMenus.map((item) => (
             <li key={item.key}>
               <NavLink
                 to={item.to}
                 className={({ isActive }) =>
-                  `flex items-center gap-8 pl-12 pr-8 py-3 rounded-xl font-medium transition
+                  `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition
                   ${
                     isActive
-                      ? "bg-blue-100 text-blue-700 shadow border-l-4 border-blue-500"
+                      ? "bg-blue-100 text-blue-700"
                       : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
                   }`
                 }
@@ -138,17 +80,58 @@ const Sidebar = () => {
               </NavLink>
             </li>
           ))}
-          <li className="mt-6 border-t border-gray-200 pt-4">
+        </ul>
+        <ul className="flex flex-col gap-1 px-4 mt-4">
+          {middleMenus.map((item) => (
+            <li key={item.key}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition
+                  ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                  }`
+                }
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+        <ul className="flex flex-col gap-1 px-4 mt-4">
+          {bottomMenus.map((item) => (
+            <li key={item.key}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition
+                  ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                  }`
+                }
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+          <li>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-8 pl-12 pr-8 py-3 text-gray-600 hover:text-red-600 hover:bg-red-50 text-base w-full focus:outline-none rounded-xl font-medium transition"
+              className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 text-base w-full focus:outline-none rounded-lg font-medium transition"
+              style={{ background: "transparent" }}
             >
               <ExitToAppIcon fontSize="medium" />
-              <span>Đăng xuất</span>
+              <span>Logout</span>
             </button>
           </li>
         </ul>
-      </nav>
+      </div>
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-64">

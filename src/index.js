@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import "./index.css";
 import App from "./App";
 
 window.addEventListener('error', (e) => {
@@ -10,7 +11,7 @@ window.addEventListener('error', (e) => {
 
 ReactDOM.render(
   <React.StrictMode>
-      <App />
+    <App />
   </React.StrictMode>,
   document.getElementById("root")
 );

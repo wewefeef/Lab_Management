@@ -2,10 +2,8 @@ import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useLog } from "../../logContext.js";
 
 const Datatable = ({ columns, rows, setRows, hideAddNew = false, actionColumn = [], context = {} }) => {
-  const { addLog } = useLog();
   const location = useLocation();
   const navigate = useNavigate();
   const path = location.pathname.split("/")[1];
@@ -18,17 +16,14 @@ const Datatable = ({ columns, rows, setRows, hideAddNew = false, actionColumn = 
       const updatedList = [...list, newItem];
       setList(updatedList);
       if (setRows) setRows(updatedList);
-      addLog(`/${path}/new`, "POST", "Add", newItem); // Thêm dữ liệu mới vào log
       navigate(location.pathname, { state: null, replace: true });
     }
-  }, [location.state, navigate, setRows, addLog]);
+  }, [location.state, navigate, setRows, list, location.pathname]);
 
   const handleDelete = (id) => {
-    const deletedItem = list.find((item) => item._id === id); // Lấy dữ liệu của mục bị xóa
     const updatedList = list.filter((item) => item._id !== id);
     setList(updatedList);
     if (setRows) setRows(updatedList);
-    addLog(`/${path}/${id}`, "DELETE", "Delete", deletedItem); // Thêm dữ liệu bị xóa vào log
   };
 
   const defaultActionColumn = actionColumn.length === 0 && path !== "invoices" ? [
@@ -71,7 +66,7 @@ const Datatable = ({ columns, rows, setRows, hideAddNew = false, actionColumn = 
         rowsPerPageOptions={[9]}
         checkboxSelection
         getRowId={(row) => row._id}
-        context={context} // Truyền context vào DataGrid
+        context={context}
       />
     </div>
   );
